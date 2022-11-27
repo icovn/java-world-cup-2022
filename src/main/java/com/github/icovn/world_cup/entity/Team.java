@@ -4,22 +4,30 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@AllArgsConstructor(staticName = "of")
 @Data
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
-public class User extends BaseEntity {
-  
-  @NotBlank
-  private String fullName;
+public class Team extends BaseEntity {
   
   @Column(unique = true)
   @NotBlank
-  private String slackUserId;
+  private String code;
+  
+  @NotBlank
+  private String name;
+  
+  private String flagUrl;
+  
+  public static Team of(@NonNull String code, @NonNull String name) {
+    var team = new Team();
+    team.setCode(code);
+    team.setName(name);
+    return team;
+  }
 }

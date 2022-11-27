@@ -1,6 +1,5 @@
 package com.github.icovn.world_cup.entity;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.validation.constraints.NotBlank;
@@ -14,12 +13,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
-public class User extends BaseEntity {
+public class Tournament extends BaseEntity {
   
   @NotBlank
-  private String fullName;
-  
-  @Column(unique = true)
-  @NotBlank
-  private String slackUserId;
+  private String name;
 }

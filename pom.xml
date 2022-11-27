@@ -23,6 +23,10 @@
       <groupId>org.springframework.boot</groupId>
     </dependency>
     <dependency>
+      <artifactId>commons-lang</artifactId>
+      <groupId>commons-lang</groupId>
+    </dependency>
+    <dependency>
       <artifactId>lombok</artifactId>
       <groupId>org.projectlombok</groupId>
     </dependency>
@@ -40,9 +44,19 @@
       <groupId>org.springframework.cloud</groupId>
     </dependency>
     <dependency>
+      <artifactId>icovn-common-logging</artifactId>
+      <groupId>com.github.icovn</groupId>
+    </dependency>
+    <dependency>
       <artifactId>mysql-connector-java</artifactId>
       <groupId>mysql</groupId>
       <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.slack.api</groupId>
+      <artifactId>bolt-jetty</artifactId>
+      <version>[1,)</version>
     </dependency>
   </dependencies>
 
@@ -75,11 +89,140 @@
         <groupId>com.github.icovn</groupId>
         <version>${icovn.java.common.version}</version>
       </dependency>
+
+      <dependency>
+        <artifactId>commons-lang</artifactId>
+        <groupId>commons-lang</groupId>
+        <version>2.6</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <groupId>com.github.icovn.world_cup</groupId>
   <modelVersion>4.0.0</modelVersion>
+
+  <profiles>
+    <profile>
+      <build>
+        <!--suppress UnresolvedMavenProperty -->
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+          <plugin>
+            <artifactId>git-commit-id-plugin</artifactId>
+            <configuration>
+              <dateFormat>dd.MM.yy_HH.mm.ss</dateFormat>
+              <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+              <generateGitPropertiesFile>true</generateGitPropertiesFile>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>revision</goal>
+                </goals>
+                <phase>initialize</phase>
+              </execution>
+            </executions>
+            <groupId>pl.project13.maven</groupId>
+            <version>4.0.0</version>
+          </plugin>
+
+          <!--skip package jar-->
+          <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default-jar</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+            <groupId>org.apache.maven.plugins</groupId>
+          </plugin>
+          <!--skip install-->
+          <plugin>
+            <artifactId>maven-install-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+            <groupId>org.apache.maven.plugins</groupId>
+          </plugin>
+          <!--skip deploy-->
+          <plugin>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+            <groupId>org.apache.maven.plugins</groupId>
+          </plugin>
+
+          <plugin>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>build-info</goal>
+                </goals>
+              </execution>
+            </executions>
+            <groupId>org.springframework.boot</groupId>
+          </plugin>
+
+          <plugin>
+            <artifactId>jib-maven-plugin</artifactId>
+            <configuration>
+              <container>
+                <args>
+                  <arg>-Xjsr305=strict</arg> <!-- Enable strict mode for JSR-305 annotations -->
+                </args>
+              </container>
+              <from>
+                <image>gcr.io/distroless/java:11</image>
+              </from>
+              <to>
+                <image>${docker.repo}/${git.branch}_${project.artifactId}</image>
+                <tags>
+                  <tag>latest</tag>
+                  <tag>${version.number}</tag>
+                </tags>
+              </to>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>build</goal>
+                </goals>
+                <id>build-and-push-docker-image</id>
+                <phase>package</phase>
+              </execution>
+            </executions>
+            <groupId>com.google.cloud.tools</groupId>
+            <version>1.8.0</version>
+          </plugin>
+        </plugins>
+      </build>
+      <id>ci</id>
+    </profile>
+    <profile>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>repackage</goal>
+                </goals>
+              </execution>
+            </executions>
+            <groupId>org.springframework.boot</groupId>
+          </plugin>
+        </plugins>
+      </build>
+      <id>dev</id>
+    </profile>
+  </profiles>
   
   <properties>
     <docker.repo>dev-docker.edupia.vn</docker.repo>

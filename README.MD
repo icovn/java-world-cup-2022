@@ -12,9 +12,23 @@ Hệ thống ghi nhận bình chọn của người chơi qua reply ở Slack. B
 - thời điểm T là 5 phút trước khi trận đấu diễn ra, bình chọn sau thời điểm T là không hợp lệ
 - bình chọn sai tên đội hoặc không phải là "Hoà", "Hòa", "hoà", "hòa" là không hợp lệ
 
+### Nghiệp vụ 3.1:
+Khi ghi nhận bình chọn của người chơi, nếu người chơi không có ở tournament_board thì thêm vào
+
+### Nghiệp vụ 3.2
+Khi bình chọn không hợp lệ hệ thống thông báo cho người chơi biết
+
 ## Nghiệp vụ 4:
 Hệ thống chấm điểm người chơi sau khi trận đấu kết thúc và lấy được kết quả
 
+### Nghiệp vụ 4.1:
+Sau khi chấm điểm người chơi, hệ thống cập nhật tổng điểm và vị trí của người  chơi ở tournament_board
+
+### Nghiệp vụ 4.2:
+Sau khi tổng hợp điểm, hệ thống gửi bảng xếp hạng mới nhất vào Slack
+
+## Nghiệp vụ 5:
+Hệ thống thông báo cho người chơi bình chọn trước khi trận đấu diễn ra 12h nếu người chơi chưa bình chọn
 
 # Thiết kế CSDL
 https://dbdiagram.io/d/638178f1c9abfc61117548d0
