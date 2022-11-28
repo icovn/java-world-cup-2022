@@ -85,6 +85,11 @@
         <version>${icovn.java.common.version}</version>
       </dependency>
       <dependency>
+        <artifactId>icovn-common-logging</artifactId>
+        <groupId>com.github.icovn</groupId>
+        <version>${icovn.java.common.version}</version>
+      </dependency>
+      <dependency>
         <artifactId>icovn-common-util</artifactId>
         <groupId>com.github.icovn</groupId>
         <version>${icovn.java.common.version}</version>
@@ -228,6 +233,8 @@
     <docker.repo>dev-docker.edupia.vn</docker.repo>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
+
+    <icovn.java.common.version>3.1.29-SNAPSHOT</icovn.java.common.version>
 
     <spring.boot.version>2.4.3</spring.boot.version>
     <spring.cloud.version>2020.0.1</spring.cloud.version>
