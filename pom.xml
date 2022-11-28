@@ -53,10 +53,17 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!--SLACK-->
     <dependency>
       <groupId>com.slack.api</groupId>
       <artifactId>bolt-jetty</artifactId>
       <version>[1,)</version>
+    </dependency>
+
+    <!--JSOUP-->
+    <dependency>
+      <artifactId>jsoup</artifactId>
+      <groupId>org.jsoup</groupId>
     </dependency>
   </dependencies>
 
@@ -99,6 +106,12 @@
         <artifactId>commons-lang</artifactId>
         <groupId>commons-lang</groupId>
         <version>2.6</version>
+      </dependency>
+
+      <dependency>
+        <artifactId>jsoup</artifactId>
+        <groupId>org.jsoup</groupId>
+        <version>1.15.3</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

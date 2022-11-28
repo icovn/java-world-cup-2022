@@ -3,6 +3,7 @@ package com.github.icovn.world_cup.entity;
 import com.github.icovn.world_cup.constant.MatchType;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
@@ -14,6 +15,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
+@Table(name = "wc_match")
 public class Match extends BaseEntity {
   
   private static final String DRAW_RESULT = "DRAW";
@@ -40,18 +42,24 @@ public class Match extends BaseEntity {
   private String tournamentId;
   
   public static Match of(
-      @NonNull String tournamentId, 
+      @NonNull String tournamentId,
+      int date,
+      int startTime,
+      @NonNull MatchType type,
       @NonNull String team1Id, 
-      @NonNull String team2Id, 
-      int date, 
-      int startTime
+      @NonNull String team2Id,
+      int team1Goals,
+      int team2Goals
   ) {
     var match = new Match();
     match.setTournamentId(tournamentId);
-    match.setTeam1Id(team1Id);
-    match.setTeam2Id(team2Id);
     match.setDate(date);
     match.setStartTime(startTime);
+    match.setType(type);
+    match.setTeam1Id(team1Id);
+    match.setTeam2Id(team2Id);
+    match.setTeam1Goals(team1Goals);
+    match.setTeam2Goals(team2Goals);
     return match;
   }
 }

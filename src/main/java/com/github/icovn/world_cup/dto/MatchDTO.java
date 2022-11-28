@@ -1,9 +1,13 @@
 package com.github.icovn.world_cup.dto;
 
 import com.github.icovn.world_cup.constant.MatchType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor(staticName = "of")
 @Data
+@NoArgsConstructor
 public class MatchDTO {
   
   private MatchType type;
@@ -13,6 +17,6 @@ public class MatchDTO {
   private int team1Goals = 0;
   private int team2Goals = 0;
   
-  private String team1Code;
-  private String team2Code;
+  private String team1Name;
+  private String team2Name;
 }

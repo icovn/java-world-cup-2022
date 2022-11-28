@@ -5,13 +5,13 @@ import static com.slack.api.model.block.composition.BlockCompositions.*;
 import static com.slack.api.model.block.element.BlockElements.*;
 import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
 
-import com.github.icovn.world_cup.exception.FindConversationFailed;
-import com.github.icovn.world_cup.exception.FindUserFailed;
-import com.github.icovn.world_cup.exception.GetMessagesFailed;
-import com.github.icovn.world_cup.exception.GetRepliesFailed;
-import com.github.icovn.world_cup.exception.GetUsersFailed;
-import com.github.icovn.world_cup.exception.PublishMessageFailed;
-import com.github.icovn.world_cup.exception.ReplyMessageFailed;
+import com.github.icovn.world_cup.exception.FindConversationFailedException;
+import com.github.icovn.world_cup.exception.FindUserFailedException;
+import com.github.icovn.world_cup.exception.GetMessagesFailedException;
+import com.github.icovn.world_cup.exception.GetRepliesFailedException;
+import com.github.icovn.world_cup.exception.GetUsersFailedException;
+import com.github.icovn.world_cup.exception.PublishMessageFailedException;
+import com.github.icovn.world_cup.exception.ReplyMessageFailedException;
 import com.github.icovn.world_cup.service.SlackService;
 import com.slack.api.Slack;
 import com.slack.api.methods.SlackApiException;
@@ -57,7 +57,7 @@ public class SlackServiceImpl implements SlackService {
   
       // throw exception when get failed
       if (!result.isOk()) {
-        throw new FindConversationFailed(result.getError());
+        throw new FindConversationFailedException(result.getError());
       }
       
       for (var channel : result.getChannels()) {
@@ -70,7 +70,7 @@ public class SlackServiceImpl implements SlackService {
       }
     } catch (SlackApiException | IOException ex) {
       log.error("(findConversation)ex: {}", getFullStackTrace(ex));
-      throw new FindConversationFailed(ex.getMessage());
+      throw new FindConversationFailedException(ex.getMessage());
     }
     return null;
   }
@@ -89,13 +89,13 @@ public class SlackServiceImpl implements SlackService {
   
       // throw exception when get failed
       if (!result.isOk()) {
-        throw new FindUserFailed(result.getError());
+        throw new FindUserFailedException(result.getError());
       }
       
       return result.getUser();
     } catch (SlackApiException | IOException ex) {
       log.error("(findConversation)ex: {}", getFullStackTrace(ex));
-      throw new FindUserFailed(ex.getMessage());
+      throw new FindUserFailedException(ex.getMessage());
     }
   }
   
@@ -114,7 +114,7 @@ public class SlackServiceImpl implements SlackService {
       
       // throw exception when get failed
       if (!result.isOk()) {
-        throw new GetMessagesFailed(result.getError());
+        throw new GetMessagesFailedException(result.getError());
       }
       
       // return messages
@@ -125,7 +125,7 @@ public class SlackServiceImpl implements SlackService {
       return messages;
     } catch (IOException | SlackApiException ex) {
       log.error("(getMessages)ex: {}", getFullStackTrace(ex));
-      throw new GetMessagesFailed(ex.getMessage());
+      throw new GetMessagesFailedException(ex.getMessage());
     }
   }
   
@@ -145,7 +145,7 @@ public class SlackServiceImpl implements SlackService {
     
       // throw exception when get failed
       if (!result.isOk()) {
-        throw new GetRepliesFailed(result.getError());
+        throw new GetRepliesFailedException(result.getError());
       }
     
       // return messages
@@ -156,7 +156,7 @@ public class SlackServiceImpl implements SlackService {
       return messages;
     } catch (IOException | SlackApiException ex) {
       log.error("(getReplies)ex: {}", getFullStackTrace(ex));
-      throw new GetRepliesFailed(ex.getMessage());
+      throw new GetRepliesFailedException(ex.getMessage());
     }
   }
   
@@ -174,7 +174,7 @@ public class SlackServiceImpl implements SlackService {
       
       // throw exception when get failed
       if (!result.isOk()) {
-        throw new GetUsersFailed(result.getError());
+        throw new GetUsersFailedException(result.getError());
       }
       
       // return users
@@ -185,7 +185,7 @@ public class SlackServiceImpl implements SlackService {
       return users;
     } catch (IOException | SlackApiException ex) {
       log.error("(getUsers)ex: {}", getFullStackTrace(ex));
-      throw new GetUsersFailed(ex.getMessage());
+      throw new GetUsersFailedException(ex.getMessage());
     }
   }
   
@@ -204,13 +204,13 @@ public class SlackServiceImpl implements SlackService {
   
       // throw exception when get failed
       if (!result.isOk()) {
-        throw new PublishMessageFailed(result.getError());
+        throw new PublishMessageFailedException(result.getError());
       }
       
       return result.getTs();
     } catch (SlackApiException | IOException ex) {
       log.error("(publishMessage)ex: {}", getFullStackTrace(ex));
-      throw new PublishMessageFailed(ex.getMessage());
+      throw new PublishMessageFailedException(ex.getMessage());
     }
   }
   
@@ -245,13 +245,13 @@ public class SlackServiceImpl implements SlackService {
     
       // throw exception when get failed
       if (!result.isOk()) {
-        throw new PublishMessageFailed(result.getError());
+        throw new PublishMessageFailedException(result.getError());
       }
     
       return result.getTs();
     } catch (SlackApiException | IOException ex) {
       log.error("(publishMessage)ex: {}", getFullStackTrace(ex));
-      throw new PublishMessageFailed(ex.getMessage());
+      throw new PublishMessageFailedException(ex.getMessage());
     }
   }
   
@@ -275,13 +275,13 @@ public class SlackServiceImpl implements SlackService {
   
       // throw exception when get failed
       if (!result.isOk()) {
-        throw new ReplyMessageFailed(result.getError());
+        throw new ReplyMessageFailedException(result.getError());
       }
       
       return result.getTs();
     } catch (SlackApiException | IOException ex) {
       log.error("(replyMessage)ex: {}", getFullStackTrace(ex));
-      throw new ReplyMessageFailed(ex.getMessage());
+      throw new ReplyMessageFailedException(ex.getMessage());
     }
   }
 }

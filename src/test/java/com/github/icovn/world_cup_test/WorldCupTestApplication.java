@@ -1,13 +1,24 @@
 package com.github.icovn.world_cup_test;
 
-import com.github.icovn.world_cup.service.impl.SlackServiceImpl;
+import com.github.icovn.world_cup.service.CrawlService;
+import com.github.icovn.world_cup.service.SlackService;
 import java.util.HashMap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+@ComponentScan(basePackages = {
+    "com.github.icovn.world_cup.service.*",
+    "com.github.icovn.world_cup.facade.*",
+})
+@EnableJpaRepositories(basePackages = {"com.github.icovn.world_cup.repository"})
+@EntityScan(basePackages = {"com.github.icovn.world_cup.entity"})
 @Slf4j
 @SpringBootApplication
 public class WorldCupTestApplication implements CommandLineRunner {
@@ -17,6 +28,9 @@ public class WorldCupTestApplication implements CommandLineRunner {
   @Value("${git.commit.message.short:}")
   private String commitMessage;
   
+  @Autowired private CrawlService crawlService;
+  @Autowired private SlackService slackService;
+  
   public static void main(String[] args) {
     SpringApplication.run(WorldCupTestApplication.class, args);
   }
@@ -25,12 +39,23 @@ public class WorldCupTestApplication implements CommandLineRunner {
   public void run(String... args) {
     log.info("(run)commit id: {}, message: {} .....", commitId, commitMessage);
   
-    testSendMessageWithRichLayout();
+    testFilterMessages(false);
   }
   
-  private void testFilterMessages() {
-    var slackService = new SlackServiceImpl();
-    
+  private void testCrawlMatches() {
+    var matches = crawlService.crawlMatch();
+    for (var match: matches) {
+      log.info("(testCrawl)match: {}", match);
+    }
+    log.info("(testCrawl)matches: {}", matches.size());
+  }
+  
+  private void testCrawlTeams() {
+    var teamNames = crawlService.crawlTeams();
+    log.info("(testCrawl)teamNames: {}", teamNames);
+  }
+  
+  private void testFilterMessages(boolean willGetReplies) {
     // find public channel
     var channelId = slackService.findConversation("world-cup-2022", false);
   
@@ -47,6 +72,9 @@ public class WorldCupTestApplication implements CommandLineRunner {
           "(run)user: {}, text: {}, ts: {}", user.getName(), message.getText(), message.getTs()
       );
     
+      if (!willGetReplies) {
+        continue;
+      }
       var replies = slackService.getReplies(channelId, message.getTs());
       for (var reply: replies) {
         log.info(
@@ -57,8 +85,6 @@ public class WorldCupTestApplication implements CommandLineRunner {
   }
   
   private void testSendMessage() {
-    var slackService = new SlackServiceImpl();
-    
     // find private channel
     var channelId = slackService.findConversation("test-world-cup", true);
     
@@ -73,8 +99,6 @@ public class WorldCupTestApplication implements CommandLineRunner {
   }
   
   private void testSendMessageWithRichLayout() {
-    var slackService = new SlackServiceImpl();
-  
     // publish rich layout message
     var choices = new HashMap<String, String>();
     choices.put("Switzerland", "Switzerland");
