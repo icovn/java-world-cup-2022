@@ -1,9 +1,11 @@
 package com.github.icovn.world_cup.entity;
 
+import com.github.icovn.util.DateUtil;
 import com.github.icovn.world_cup.constant.MatchType;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
@@ -18,7 +20,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "wc_match")
 public class Match extends BaseEntity {
   
-  private static final String DRAW_RESULT = "DRAW";
+  public static final String DRAW_RESULT = "DRAW";
   
   @NotNull
   private MatchType type;
@@ -40,6 +42,22 @@ public class Match extends BaseEntity {
   
   @NotBlank
   private String tournamentId;
+  
+  @Transient
+  public String getDateString() {
+    var matchDate = DateUtil.toDate(Integer.toString(date), "yyyyMMdd");
+    return DateUtil.toString(matchDate, "dd/MM/yyyy");
+  }
+  
+  @Transient
+  public String getTimeString() {
+    var hour = startTime/60;
+    var minutes = startTime % 60;
+    if (minutes == 0) {
+      return "(" + hour + "h" + ")";  
+    } 
+    return "(" + hour + "h:" + minutes + ")";
+  }
   
   public static Match of(
       @NonNull String tournamentId,

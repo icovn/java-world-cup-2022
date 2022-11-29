@@ -49,6 +49,11 @@
       <scope>runtime</scope>
     </dependency>
 
+    <dependency>
+      <artifactId>icovn-common-util</artifactId>
+      <groupId>com.github.icovn</groupId>
+    </dependency>
+    
     <!--SLACK-->
     <dependency>
       <groupId>com.slack.api</groupId>

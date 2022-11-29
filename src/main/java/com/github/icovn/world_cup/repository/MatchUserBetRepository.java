@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MatchUserBetRepository extends JpaRepository<MatchUserBet, String> {
   
+  MatchUserBet findFirstByMatchIdAndUserId(String matchId, String userId);
 }

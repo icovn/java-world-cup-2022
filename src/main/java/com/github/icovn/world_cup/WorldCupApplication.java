@@ -4,6 +4,7 @@ import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace
 
 import com.github.icovn.world_cup.component.CustomAuditorAware;
 import com.github.icovn.world_cup.component.InitDataComponent;
+import com.github.icovn.world_cup.facade.MatchFacade;
 import com.slack.api.bolt.App;
 import com.slack.api.bolt.jetty.SlackAppServer;
 import com.slack.api.model.event.MessageChangedEvent;
@@ -35,6 +36,7 @@ public class WorldCupApplication implements CommandLineRunner {
   }
   
   @Autowired private InitDataComponent initDataComponent;
+  @Autowired private MatchFacade matchFacade;
   
   public static void main(String[] args) {
     SpringApplication.run(WorldCupApplication.class, args);
@@ -46,6 +48,7 @@ public class WorldCupApplication implements CommandLineRunner {
   
     try {
       initDataComponent.init();
+      matchFacade.postMatches();
       
       initSlack();
     } catch (Exception ex) {

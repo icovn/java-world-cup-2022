@@ -26,10 +26,11 @@ public class MatchUserBet extends BaseEntity {
   @NotBlank
   private String userId;
   
-  public static MatchUserBet of(@NonNull String matchId, @NonNull String userId) {
+  public static MatchUserBet of(@NonNull String matchId, @NonNull String userId, String bet) {
     var matchUserBet = new MatchUserBet();
     matchUserBet.setMatchId(matchId);
     matchUserBet.setUserId(userId);
+    matchUserBet.setBet(bet);
     return matchUserBet;
   }
 }

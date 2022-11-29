@@ -99,10 +99,10 @@ public class InitDataComponent {
     for (var match: matches) {
       log.debug("(testCrawl)match: {}", match);
       
-      var team1Id = getTeamId(match.getTeam1Name(), savedTeams);
+      var team1Id = Team.getTeamId(match.getTeam1Name(), savedTeams);
       log.debug("(testCrawl)team1Id: {}", team1Id);
       
-      var team2Id = getTeamId(match.getTeam2Name(), savedTeams);
+      var team2Id = Team.getTeamId(match.getTeam2Name(), savedTeams);
       log.debug("(testCrawl)team2Id: {}", team2Id);
       
       matchRepository.save(Match.of(
@@ -118,13 +118,5 @@ public class InitDataComponent {
     }
   }
   
-  public String getTeamId(String teamName, List<Team> teams) {
-    for (var team: teams) {
-      if (team.getName().equals(teamName)) {
-        return team.getId();
-      }
-    }
-    
-    return null;
-  }
+  
 }

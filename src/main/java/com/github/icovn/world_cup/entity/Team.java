@@ -1,5 +1,6 @@
 package com.github.icovn.world_cup.entity;
 
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -31,5 +32,25 @@ public class Team extends BaseEntity {
     team.setCode(code);
     team.setName(name);
     return team;
+  }
+  
+  public static String getTeamId(String teamName, List<Team> teams) {
+    for (var team: teams) {
+      if (team.getName().equals(teamName)) {
+        return team.getId();
+      }
+    }
+    
+    return null;
+  }
+  
+  public static String getTeamName(String teamId, List<Team> teams) {
+    for (var team: teams) {
+      if (team.getId().equals(teamId)) {
+        return team.getName();
+      }
+    }
+    
+    return null;
   }
 }
