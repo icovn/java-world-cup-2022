@@ -26,4 +26,8 @@ public interface UserFacade {
    * Update user bet result and core in board
    */
   void updateScore();
+  
+  void viewLeaderBoard(@NonNull String userId);
+  
+  void viewMyBet(@NonNull String userId);
 }

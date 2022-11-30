@@ -101,9 +101,9 @@ public class WorldCupTestApplication implements CommandLineRunner {
   private void testSendMessageWithRichLayout() {
     // publish rich layout message
     var choices = new HashMap<String, String>();
-    choices.put("Switzerland", "Switzerland");
-    choices.put("Cameroon", "Cameroon");
-    slackService.publishMessage(
+    choices.put("Switzerland", "Match1_Switzerland");
+    choices.put("Cameroon", "Match1_Cameroon");
+    slackService.publishMatch(
         "test-world-cup",
         "24/11/2022 (17h) - Bảng G: Switzerland vs Cameroon",
         choices
