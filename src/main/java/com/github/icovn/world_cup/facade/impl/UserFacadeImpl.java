@@ -45,8 +45,8 @@ public class UserFacadeImpl implements UserFacade {
       if (existBet.getBet().equals(Match.DRAW_RESULT)) {
         slackService.replyMessage(
             channelName, 
-            match.getSlackMessageId(), 
-            userName + " đã bet: Hòa"
+            match.getSlackMessageId(),
+            ":thumbsup:*" + userName + "* đã bet: `Hòa`"
         );
       } else {
         var team = teamRepository.findById(existBet.getBet()).orElse(null);
@@ -55,8 +55,8 @@ public class UserFacadeImpl implements UserFacade {
         }
         slackService.replyMessage(
             channelName, 
-            match.getSlackMessageId(), 
-            userName + " đã bet: " + team.getName()
+            match.getSlackMessageId(),
+            ":thumbsup:*" + userName + "* đã bet: `" + team.getName() + "`"
         );
       }
       return;
@@ -69,7 +69,7 @@ public class UserFacadeImpl implements UserFacade {
       slackService.replyMessage(
           channelName,
           match.getSlackMessageId(),
-          userName + " bet: Hòa"
+          "*" + userName + "* bet: `Hòa`"
       );
     } else {
       var team = teamRepository.findById(bet).orElse(null);
@@ -79,7 +79,7 @@ public class UserFacadeImpl implements UserFacade {
       slackService.replyMessage(
           channelName,
           match.getSlackMessageId(),
-          userName + " bet: " + team.getName()
+          "*" + userName + "* bet: `" + team.getName() + "`"
       );
     }
   }
