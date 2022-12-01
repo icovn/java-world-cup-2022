@@ -96,7 +96,7 @@ public class MatchFacadeImpl implements MatchFacade {
       choices.put("Hòa", match.getId() + "_" + Match.DRAW_RESULT);
       
       var messageText = match.getDateString() + " " + match.getTimeString() + " - " + team1Name + " vs " + team2Name;
-      var messageTs = slackService.publishMessage(
+      var messageTs = slackService.publishMatch(
           channelName,
           messageText,
           choices

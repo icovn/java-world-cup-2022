@@ -190,32 +190,12 @@ public class SlackServiceImpl implements SlackService {
   }
   
   @Override
-  public String publishMessage(@NonNull String channelName, @NonNull String text) {
-    log.info("(publishMessage)channelName: {}, text: {}", channelName, text);
-    var client = Slack.getInstance().methods();
-  
-    try {
-      var result = client.chatPostMessage(r -> r
-          .token(System.getenv("SLACK_BOT_TOKEN"))
-          .channel(channelName)
-          .text(text)
-      );
-      log.info("(publishMessage)result: {}", result);
-  
-      // throw exception when get failed
-      if (!result.isOk()) {
-        throw new PublishMessageFailedException(result.getError());
-      }
-      
-      return result.getTs();
-    } catch (SlackApiException | IOException ex) {
-      log.error("(publishMessage)ex: {}", getFullStackTrace(ex));
-      throw new PublishMessageFailedException(ex.getMessage());
-    }
+  public String publishLeaderBoard(@NonNull String channelName, List<String> usersRank) {
+    return null;
   }
   
   @Override
-  public String publishMessage(
+  public String publishMatch(
       @NonNull String channelName, 
       @NonNull String text,
       Map<String, String> choices
@@ -228,8 +208,8 @@ public class SlackServiceImpl implements SlackService {
           .token(System.getenv("SLACK_BOT_TOKEN"))
           .channel(channelName)
           .blocks(asBlocks(
-              section(section -> section.text(markdownText(text))),
               divider(),
+              section(section -> section.text(markdownText(text))),
               actions(actions -> actions
                   .elements(
                       choices.entrySet().stream().map(o -> button(
@@ -238,7 +218,8 @@ public class SlackServiceImpl implements SlackService {
                           )
                       ).collect(Collectors.toList())
                   )
-              )
+              ),
+              divider()
           ))
       );
       log.info("(publishMessage)result: {}", result);
@@ -253,6 +234,37 @@ public class SlackServiceImpl implements SlackService {
       log.error("(publishMessage)ex: {}", getFullStackTrace(ex));
       throw new PublishMessageFailedException(ex.getMessage());
     }
+  }
+  
+  @Override
+  public String publishMessage(@NonNull String channelName, @NonNull String text) {
+    log.info("(publishMessage)channelName: {}, text: {}", channelName, text);
+    var client = Slack.getInstance().methods();
+    
+    try {
+      var result = client.chatPostMessage(r -> r
+          .token(System.getenv("SLACK_BOT_TOKEN"))
+          .channel(channelName)
+          .text(text)
+      );
+      log.info("(publishMessage)result: {}", result);
+      
+      // throw exception when get failed
+      if (!result.isOk()) {
+        throw new PublishMessageFailedException(result.getError());
+      }
+      
+      return result.getTs();
+    } catch (SlackApiException | IOException ex) {
+      log.error("(publishMessage)ex: {}", getFullStackTrace(ex));
+      throw new PublishMessageFailedException(ex.getMessage());
+    }
+  }
+  
+  @Override
+  public String publishUserBetHistory(@NonNull String channelName, @NonNull String userId,
+      List<String> bets) {
+    return null;
   }
   
   @Override
