@@ -45,6 +45,7 @@ public class MatchFacadeImpl implements MatchFacade {
     log.info("(createMatches)teams: {}", teams.size());
     
     for (var match: matches) {
+      log.info("(createMatches)match: {}", match);
       var team1Id = Team.getTeamId(match.getTeam1Name(), teams);
       if (team1Id == null) {
         throw new TeamNotFoundException(match.getTeam1Name());
@@ -60,6 +61,7 @@ public class MatchFacadeImpl implements MatchFacade {
           team1Id, 
           team2Id
       );
+      log.info("(createMatches)existMatch: {}", existMatch);
       if (existMatch != null) {
         continue;
       }
@@ -81,13 +83,13 @@ public class MatchFacadeImpl implements MatchFacade {
   public void postMatches() {
     var matches = matchRepository.findAllBySlackMessageIdIsNullOrderByDateAscStartTimeAsc();
     var teams = teamRepository.findAll();
-    log.info("(createMatches)teams: {}", teams.size());
+    log.info("(postMatches)teams: {}", teams.size());
     
     var currentDate = Integer.parseInt(DateUtil.toString(new Date(), "yyyyMMdd"));
-    log.info("(createMatches)currentDate: {}", currentDate);
+    log.info("(postMatches)currentDate: {}", currentDate);
     
     for (var match: matches) {
-      log.info("(createMatches)match: {}", match);
+      log.info("(postMatches)match: {}", match);
       if (currentDate > match.getDate()) {
         continue;
       }
