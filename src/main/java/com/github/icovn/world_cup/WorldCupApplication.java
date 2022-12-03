@@ -29,6 +29,8 @@ public class WorldCupApplication implements CommandLineRunner {
   private String commitId;
   @Value("${git.commit.message.short:}")
   private String commitMessage;
+  @Value("${application.mode:}")
+  private String mode;
   
   @Bean
   public AuditorAware<String> auditorAware() {
@@ -48,7 +50,13 @@ public class WorldCupApplication implements CommandLineRunner {
   
     try {
       initDataComponent.init();
-      matchFacade.postMatches();
+      
+      if (mode.equals("CREATE_MATCHES")) {
+        matchFacade.createMatches();
+      }
+      if (mode.equals("POST_MATCHES")) {
+        matchFacade.postMatches();
+      }
       
       initSlack();
     } catch (Exception ex) {

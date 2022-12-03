@@ -191,6 +191,7 @@ public class SlackServiceImpl implements SlackService {
   
   @Override
   public String publishLeaderBoard(@NonNull String channelName, List<String> usersRank) {
+    log.info("(publishLeaderBoard)channelName: {}, usersRank: {}", channelName, usersRank);
     return null;
   }
   
@@ -262,8 +263,14 @@ public class SlackServiceImpl implements SlackService {
   }
   
   @Override
-  public String publishUserBetHistory(@NonNull String channelName, @NonNull String userId,
-      List<String> bets) {
+  public String publishUserBetHistory(
+      @NonNull String channelName, 
+      @NonNull String userId,
+      List<String> bets
+  ) {
+    log.info(
+        "(publishUserBetHistory)channelName: {}, userId: {}, bets: {}", channelName, userId, bets
+    );
     return null;
   }
   

@@ -30,6 +30,9 @@ public class MatchFacadeImpl implements MatchFacade {
   @Value("${application.default.world_cup_channel_name:test-world-cup}")
   private String channelName;
   
+  @Value("${application.default.enable_draw:false}")
+  private Boolean enableDraw;
+  
   @Value("${application.default.world_cup_tournament_id:2022_11_QATAR}")
   private String tournamentId;
   
@@ -84,7 +87,8 @@ public class MatchFacadeImpl implements MatchFacade {
     log.info("(createMatches)currentDate: {}", currentDate);
     
     for (var match: matches) {
-      if (currentDate >= match.getDate()) {
+      log.info("(createMatches)match: {}", match);
+      if (currentDate > match.getDate()) {
         continue;
       }
       
@@ -93,7 +97,9 @@ public class MatchFacadeImpl implements MatchFacade {
       var choices = new HashMap<String, String>();
       choices.put(team1Name, match.getId() + "_" + match.getTeam1Id());
       choices.put(team2Name, match.getId() + "_" + match.getTeam2Id());
-      choices.put("Hòa", match.getId() + "_" + Match.DRAW_RESULT);
+      if (enableDraw) {
+        choices.put("Hòa", match.getId() + "_" + Match.DRAW_RESULT);
+      }
       
       var messageText = match.getDateString() + " " + match.getTimeString() + " - " + team1Name + " vs " + team2Name;
       var messageTs = slackService.publishMatch(
