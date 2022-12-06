@@ -2,6 +2,8 @@ package com.github.icovn.world_cup_test;
 
 import com.github.icovn.world_cup.service.CrawlService;
 import com.github.icovn.world_cup.service.SlackService;
+import com.github.icovn.world_cup_test.component.InitDataComponent;
+import com.github.icovn.world_cup_test.component.ProcessOldDataFromSlack;
 import java.util.HashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @ComponentScan(basePackages = {
     "com.github.icovn.world_cup.service.*",
-    "com.github.icovn.world_cup.facade.*",
+    "com.github.icovn.world_cup.facade.*"
+}, basePackageClasses = {
+    InitDataComponent.class,
+    ProcessOldDataFromSlack.class
 })
 @EnableJpaRepositories(basePackages = {"com.github.icovn.world_cup.repository"})
 @EntityScan(basePackages = {"com.github.icovn.world_cup.entity"})
@@ -29,6 +34,8 @@ public class WorldCupTestApplication implements CommandLineRunner {
   private String commitMessage;
   
   @Autowired private CrawlService crawlService;
+  @Autowired private InitDataComponent initDataComponent;
+  @Autowired private ProcessOldDataFromSlack processOldDataFromSlack;
   @Autowired private SlackService slackService;
   
   public static void main(String[] args) {
@@ -39,7 +46,10 @@ public class WorldCupTestApplication implements CommandLineRunner {
   public void run(String... args) {
     log.info("(run)commit id: {}, message: {} .....", commitId, commitMessage);
   
-    testFilterMessages(false);
+//    initDataComponent.init();
+    processOldDataFromSlack.loadUserBets();
+
+//    testFilterMessages(false);
   }
   
   private void testCrawlMatches() {

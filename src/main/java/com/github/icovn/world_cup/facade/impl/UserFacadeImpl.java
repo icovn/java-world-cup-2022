@@ -1,5 +1,6 @@
 package com.github.icovn.world_cup.facade.impl;
 
+import com.github.icovn.world_cup.constant.BetStatus;
 import com.github.icovn.world_cup.entity.Match;
 import com.github.icovn.world_cup.entity.MatchUserBet;
 import com.github.icovn.world_cup.exception.MatchNotFoundException;
@@ -56,7 +57,7 @@ public class UserFacadeImpl implements UserFacade {
         slackService.replyMessage(
             channelName, 
             match.getSlackMessageId(),
-            ":thumbsup:*" + userName + "* đã bet: `Hòa`"
+            "*" + userName + "* đã bet: `Hòa`"
         );
       } else {
         var team = teamRepository.findById(existBet.getBet()).orElse(null);
@@ -66,9 +67,24 @@ public class UserFacadeImpl implements UserFacade {
         slackService.replyMessage(
             channelName, 
             match.getSlackMessageId(),
-            ":thumbsup:*" + userName + "* đã bet: `" + team.getName() + "`"
+            "*" + userName + "* đã bet: `" + team.getName() + "`"
         );
       }
+      return;
+    }
+    
+    if (System.currentTimeMillis() >= match.getStartTimeInTimestamp()) {
+      // make a new invalid bet
+      matchUserBetRepository.save(MatchUserBet.of(
+          matchId, userId, BetStatus.LATE_BET
+      ));
+  
+      slackService.replyMessage(
+          channelName,
+          match.getSlackMessageId(),
+          ":thumbsdown: *" + userName + "* bet: `Muộn`"
+      );
+      
       return;
     }
     
@@ -82,7 +98,7 @@ public class UserFacadeImpl implements UserFacade {
       slackService.replyMessage(
           channelName,
           match.getSlackMessageId(),
-          "*" + userName + "* bet: `Hòa`"
+          ":thumbsup: *" + userName + "* bet: `Hòa`"
       );
     } else {
       var team = teamRepository.findById(bet).orElse(null);
@@ -92,7 +108,7 @@ public class UserFacadeImpl implements UserFacade {
       slackService.replyMessage(
           channelName,
           match.getSlackMessageId(),
-          "*" + userName + "* bet: `" + team.getName() + "`"
+          ":thumbsup: *" + userName + "* bet: `" + team.getName() + "`"
       );
     }
   }
@@ -104,7 +120,28 @@ public class UserFacadeImpl implements UserFacade {
   
   @Override
   public void updateScore() {
+    log.info("(updateScore)");
+    var matches = matchRepository.findAll();
+    log.info("(updateScore)matches: {}", matches.size());
+    var userBets = matchUserBetRepository.findAllByResultLessThan(0);
+    log.info("(updateScore)userBets: {}", userBets.size());
     
+    for (var userBet: userBets) {
+      log.info("(updateScore)userBet: {}", userBet);
+      var match = Match.getMatch(userBet.getMatchId(), matches);
+      if (match == null) {
+        log.warn("(updateScore)userBet: {} --> MATCH_NOT_FOUND", userBet);
+        continue;
+      }
+      
+      if (userBet.getBet().equals(match.getResult())) {
+        userBet.setResult(1);
+      } else {
+        userBet.setResult(0);
+      }
+      log.info("(updateScore)userBet: {}, match: {}", userBet.getBet(), match.getResult());
+      matchUserBetRepository.save(userBet);
+    }
   }
   
   @Override

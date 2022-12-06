@@ -34,23 +34,32 @@ public class Team extends BaseEntity {
     return team;
   }
   
-  public static String getTeamId(String teamName, List<Team> teams) {
-    for (var team: teams) {
-      if (team.getName().equals(teamName)) {
-        return team.getId();
-      }
+  public static String getTeamIdByCode(String teamCode, List<Team> teams) {
+    var team = teams.stream()
+        .filter(o -> o.getCode().equals(teamCode)).findFirst().orElse(null);
+    if (team == null) {
+      return null;
     }
     
-    return null;
+    return team.getId();
+  }
+  
+  public static String getTeamIdByName(String teamName, List<Team> teams) {
+    var team = teams.stream()
+        .filter(o -> o.getName().equals(teamName)).findFirst().orElse(null);
+    if (team == null) {
+      return null;
+    }
+    
+    return team.getId();
   }
   
   public static String getTeamName(String teamId, List<Team> teams) {
-    for (var team: teams) {
-      if (team.getId().equals(teamId)) {
-        return team.getName();
-      }
+    var team = teams.stream()
+        .filter(o -> o.getId().equals(teamId)).findFirst().orElse(null);
+    if (team == null) {
+      return null;
     }
-    
-    return null;
+    return team.getName();
   }
 }

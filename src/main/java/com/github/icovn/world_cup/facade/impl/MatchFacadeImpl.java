@@ -7,7 +7,6 @@ import com.github.icovn.world_cup.exception.TeamNotFoundException;
 import com.github.icovn.world_cup.facade.MatchFacade;
 import com.github.icovn.world_cup.repository.MatchRepository;
 import com.github.icovn.world_cup.repository.TeamRepository;
-import com.github.icovn.world_cup.repository.TournamentRepository;
 import com.github.icovn.world_cup.service.CrawlService;
 import com.github.icovn.world_cup.service.SlackService;
 import java.util.Date;
@@ -46,11 +45,11 @@ public class MatchFacadeImpl implements MatchFacade {
     
     for (var match: matches) {
       log.info("(createMatches)match: {}", match);
-      var team1Id = Team.getTeamId(match.getTeam1Name(), teams);
+      var team1Id = Team.getTeamIdByName(match.getTeam1Name(), teams);
       if (team1Id == null) {
         throw new TeamNotFoundException(match.getTeam1Name());
       }
-      var team2Id = Team.getTeamId(match.getTeam2Name(), teams);
+      var team2Id = Team.getTeamIdByName(match.getTeam2Name(), teams);
       if (team2Id == null) {
         throw new TeamNotFoundException(match.getTeam2Name());
       }
@@ -118,6 +117,44 @@ public class MatchFacadeImpl implements MatchFacade {
   
   @Override
   public void updateMatchesResult() {
-    
+    log.info("(updateMatchesResult)");
+    var matches = crawlService.crawlMatch();
+    log.info("(updateMatchesResult)matches: {}", matches.size());
+    var teams = teamRepository.findAll();
+    log.info("(updateMatchesResult)teams: {}", teams.size());
+  
+    for (var match: matches) {
+      log.info("(updateMatchesResult)match: {}", match);
+      var team1Id = Team.getTeamIdByName(match.getTeam1Name(), teams);
+      if (team1Id == null) {
+        throw new TeamNotFoundException(match.getTeam1Name());
+      }
+      var team2Id = Team.getTeamIdByName(match.getTeam2Name(), teams);
+      if (team2Id == null) {
+        throw new TeamNotFoundException(match.getTeam2Name());
+      }
+  
+      var existMatch = matchRepository.findFirstByTournamentIdAndDateAndTeam1IdAndTeam2Id(
+          tournamentId,
+          match.getDate(),
+          team1Id,
+          team2Id
+      );
+      log.info("(updateMatchesResult)existMatch: {}", existMatch);
+      if (existMatch != null && existMatch.getResult() == null) {
+        existMatch.setTeam1Goals(match.getTeam1Goals());
+        existMatch.setTeam2Goals(match.getTeam2Goals());
+        if (match.getTeam1Goals() > match.getTeam2Goals()) {
+          existMatch.setResult(existMatch.getTeam1Id());
+        }
+        if (match.getTeam1Goals() < match.getTeam2Goals()) {
+          existMatch.setResult(existMatch.getTeam2Id());
+        }
+        if (match.getTeam1Goals() == match.getTeam2Goals()) {
+          existMatch.setResult(Match.DRAW_RESULT);
+        }
+        matchRepository.save(existMatch);
+      }
+    }
   }
 }

@@ -1,4 +1,4 @@
-package com.github.icovn.world_cup.component;
+package com.github.icovn.world_cup_test.component;
 
 import com.github.icovn.world_cup.entity.Match;
 import com.github.icovn.world_cup.entity.Team;
@@ -99,10 +99,10 @@ public class InitDataComponent {
     for (var match: matches) {
       log.debug("(testCrawl)match: {}", match);
       
-      var team1Id = Team.getTeamId(match.getTeam1Name(), savedTeams);
+      var team1Id = Team.getTeamIdByName(match.getTeam1Name(), savedTeams);
       log.debug("(testCrawl)team1Id: {}", team1Id);
       
-      var team2Id = Team.getTeamId(match.getTeam2Name(), savedTeams);
+      var team2Id = Team.getTeamIdByName(match.getTeam2Name(), savedTeams);
       log.debug("(testCrawl)team2Id: {}", team2Id);
       
       matchRepository.save(Match.of(

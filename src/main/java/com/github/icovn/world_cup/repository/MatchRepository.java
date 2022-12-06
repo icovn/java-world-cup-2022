@@ -8,6 +8,8 @@ public interface MatchRepository extends JpaRepository<Match, String> {
   
   List<Match> findAllBySlackMessageIdIsNullOrderByDateAscStartTimeAsc();
   
+  Match findFirstBySlackMessageId(String slackMessageId);
+  
   Match findFirstByTournamentIdAndDateAndTeam1IdAndTeam2Id(
       String tournamentId, 
       int date, 

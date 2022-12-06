@@ -2,6 +2,7 @@ package com.github.icovn.world_cup.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import lombok.Data;
@@ -13,7 +14,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
-@Table(name = "wc_tournament_user_board")
+@Table(
+    name = "wc_tournament_user_board",
+    indexes = @Index(
+        name = "id_tournament_user_board_main", 
+        columnList = "tournamentId,userId", 
+        unique = true
+    )
+)
 public class TournamentUserBoard extends BaseEntity {
   
   private int score = 0;

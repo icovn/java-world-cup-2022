@@ -2,6 +2,8 @@ package com.github.icovn.world_cup.entity;
 
 import com.github.icovn.util.DateUtil;
 import com.github.icovn.world_cup.constant.MatchType;
+import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Table;
@@ -32,6 +34,7 @@ public class Match extends BaseEntity {
   
   private String result;
   
+  @Column(unique = true)
   private String slackMessageId;
   
   @NotBlank
@@ -47,6 +50,15 @@ public class Match extends BaseEntity {
   public String getDateString() {
     var matchDate = DateUtil.toDate(Integer.toString(date), "yyyyMMdd");
     return DateUtil.toString(matchDate, "dd/MM/yyyy");
+  }
+  
+  @Transient
+  public long getStartTimeInTimestamp() {
+    var hour = startTime/60;
+    var minutes = startTime % 60;
+    var dateAndTime = date + " " + hour + ":" + minutes;
+    var matchDate = DateUtil.toDate(dateAndTime, "yyyyMMdd H:m");
+    return matchDate.getTime();
   }
   
   @Transient
@@ -79,5 +91,11 @@ public class Match extends BaseEntity {
     match.setTeam1Goals(team1Goals);
     match.setTeam2Goals(team2Goals);
     return match;
+  }
+  
+  public static Match getMatch(String matchId, List<Match> matches) {
+    return matches.stream()
+        .filter(o -> o.getId().equals(matchId))
+        .findFirst().orElse(null);
   }
 }

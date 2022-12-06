@@ -3,7 +3,6 @@ package com.github.icovn.world_cup;
 import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
 
 import com.github.icovn.world_cup.component.CustomAuditorAware;
-import com.github.icovn.world_cup.component.InitDataComponent;
 import com.github.icovn.world_cup.facade.MatchFacade;
 import com.slack.api.bolt.App;
 import com.slack.api.bolt.jetty.SlackAppServer;
@@ -39,7 +38,6 @@ public class WorldCupApplication implements CommandLineRunner {
     return new CustomAuditorAware();
   }
   
-  @Autowired private InitDataComponent initDataComponent;
   @Autowired private MatchFacade matchFacade;
   
   public static void main(String[] args) {
@@ -51,8 +49,6 @@ public class WorldCupApplication implements CommandLineRunner {
     log.info("(run)commit id: {}, message: {} .....", commitId, commitMessage);
   
     try {
-      initDataComponent.init();
-      
       if (mode.equals("CREATE_MATCHES")) {
         matchFacade.createMatches();
       }
