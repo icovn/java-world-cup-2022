@@ -113,7 +113,9 @@ public class InitDataComponent {
           team1Id,
           team2Id,
           match.getTeam1Goals(),
-          match.getTeam2Goals()
+          match.getTeam2Goals(),
+          match.getTeam1Pens(),
+          match.getTeam2Pens()
       ));
     }
   }

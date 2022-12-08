@@ -73,7 +73,9 @@ public class MatchFacadeImpl implements MatchFacade {
           team1Id,
           team2Id,
           match.getTeam1Goals(),
-          match.getTeam2Goals()
+          match.getTeam2Goals(),
+          match.getTeam1Pens(),
+          match.getTeam2Pens()
       ));
     }
   }
@@ -148,14 +150,30 @@ public class MatchFacadeImpl implements MatchFacade {
       if (existMatch != null && existMatch.getResult() == null) {
         existMatch.setTeam1Goals(match.getTeam1Goals());
         existMatch.setTeam2Goals(match.getTeam2Goals());
+        existMatch.setTeam1Pens(match.getTeam1Pens());
+        existMatch.setTeam2Pens(match.getTeam2Pens());
+        
+        // not draw in main time
         if (match.getTeam1Goals() > match.getTeam2Goals()) {
           existMatch.setResult(existMatch.getTeam1Id());
         }
         if (match.getTeam1Goals() < match.getTeam2Goals()) {
           existMatch.setResult(existMatch.getTeam2Id());
         }
+        
+        // draw in main time
         if (match.getTeam1Goals() == match.getTeam2Goals()) {
-          existMatch.setResult(Match.DRAW_RESULT);
+          if (match.getTeam1Pens() > match.getTeam2Pens()) {
+            existMatch.setResult(existMatch.getTeam1Id());
+          }
+          
+          if (match.getTeam1Pens() < match.getTeam2Pens()) {
+            existMatch.setResult(existMatch.getTeam2Id());
+          }
+  
+          if (match.getTeam1Pens() == match.getTeam2Pens()) {
+            existMatch.setResult(Match.DRAW_RESULT);
+          }
         }
         matchRepository.save(existMatch);
       }

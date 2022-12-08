@@ -38,19 +38,19 @@ public class CrawlServiceImpl implements CrawlService {
         log.info("(crawl)text: {}", element.text());
         
         var boxTable = element.getElementsByClass("box-table");
-        log.info("(crawl)table: {}", boxTable.text());
+        log.debug("(crawl)table: {}", boxTable.text());
         
         var boxTime = element.getElementsByClass("box-time");
-        log.info("(crawl)time: {}", boxTime.text());
+        log.debug("(crawl)time: {}", boxTime.text());
         
         var boxScore = element.getElementsByClass("box-score");
-        log.info("(crawl)score: {}", boxScore.text());
+        log.debug("(crawl)score: {}", boxScore.text());
         
         var teams = element.getElementsByClass("team-name");
         var isValid = true;
         var teamNames = new ArrayList<String>();
         for (var team: teams) {
-          log.info("(crawl)team: {}", team.text());
+          log.debug("(crawl)team: {}", team.text());
           if (!isValidTeam(team.text())) {
             isValid = false;
             break;
@@ -68,6 +68,8 @@ public class CrawlServiceImpl implements CrawlService {
             getStartTime(boxTime.text()),
             getTeamGoals(boxScore.text(), true),
             getTeamGoals(boxScore.text(), false),
+            getTeamPens(boxScore.text(), true),
+            getTeamPens(boxScore.text(), false),
             teamNames.get(0),
             teamNames.get(1)
         );
@@ -116,7 +118,7 @@ public class CrawlServiceImpl implements CrawlService {
   
   private int getTeamGoals(String input, boolean isFirstTeam) {
     if (input == null || input.isBlank()) {
-      return 0;
+      return -1;
     }
     
     var parts = input.split(" ");
@@ -125,6 +127,24 @@ public class CrawlServiceImpl implements CrawlService {
     }
   
     return Integer.parseInt(parts[1]);
+  }
+  
+  private int getTeamPens(String input, boolean isFirstTeam) {
+    if (input == null || input.isBlank()) {
+      return -1;
+    }
+    
+    var parts = input.split(" ");
+    if (parts.length < 4) {
+      return -1;
+    }
+    
+    var penParts = parts[3].replace(")", "").split("-");
+    if (isFirstTeam) {
+      return Integer.parseInt(penParts[0]);
+    }
+    
+    return Integer.parseInt(penParts[1]);
   }
   
   private MatchType getType(String input) {

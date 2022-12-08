@@ -16,6 +16,8 @@ public class MatchDTO {
   private int startTime = 0;
   private int team1Goals = -1;
   private int team2Goals = -1;
+  private int team1Pens = -1;
+  private int team2Pens = -1;
   
   private String team1Name;
   private String team2Name;

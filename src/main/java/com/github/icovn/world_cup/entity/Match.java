@@ -29,8 +29,10 @@ public class Match extends BaseEntity {
   
   private int date = 0;
   private int startTime = 0;
-  private int team1Goals = 0;
-  private int team2Goals = 0;
+  private int team1Goals = -1;
+  private int team2Goals = -1;
+  private int team1Pens = -1;
+  private int team2Pens = -1;
   
   private String result;
   
@@ -76,10 +78,8 @@ public class Match extends BaseEntity {
       int date,
       int startTime,
       @NonNull MatchType type,
-      @NonNull String team1Id, 
-      @NonNull String team2Id,
-      int team1Goals,
-      int team2Goals
+      @NonNull String team1Id,
+      @NonNull String team2Id
   ) {
     var match = new Match();
     match.setTournamentId(tournamentId);
@@ -88,8 +88,25 @@ public class Match extends BaseEntity {
     match.setType(type);
     match.setTeam1Id(team1Id);
     match.setTeam2Id(team2Id);
+    return match;
+  }
+  
+  public static Match of(
+      @NonNull String tournamentId,
+      int date,
+      int startTime,
+      @NonNull MatchType type,
+      @NonNull String team1Id, 
+      @NonNull String team2Id,
+      int team1Goals,
+      int team2Goals,
+      int team1Pens,
+      int team2Pens
+  ) {
+    var match = Match.of(tournamentId, date, startTime, type, team1Id, team2Id);
     match.setTeam1Goals(team1Goals);
     match.setTeam2Goals(team2Goals);
+    match.setTeam1Pens(team1Pens);
     return match;
   }
   

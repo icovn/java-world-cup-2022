@@ -49,10 +49,11 @@ public class WorldCupTestApplication implements CommandLineRunner {
   
 //    initDataComponent.init();
 //    processOldDataFromSlack.loadUserBets();
-
+  
+    testCrawlMatches();
 //    testFilterMessages(false);
 //    testSendLeaderBoard();
-    testSendUserBetHistories();
+//    testSendUserBetHistories();
   }
   
   private void testCrawlMatches() {
