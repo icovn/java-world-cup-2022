@@ -5,6 +5,7 @@ import com.github.icovn.world_cup.service.SlackService;
 import com.github.icovn.world_cup_test.component.InitDataComponent;
 import com.github.icovn.world_cup_test.component.ProcessOldDataFromSlack;
 import java.util.HashMap;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,9 +48,11 @@ public class WorldCupTestApplication implements CommandLineRunner {
     log.info("(run)commit id: {}, message: {} .....", commitId, commitMessage);
   
 //    initDataComponent.init();
-    processOldDataFromSlack.loadUserBets();
+//    processOldDataFromSlack.loadUserBets();
 
 //    testFilterMessages(false);
+//    testSendLeaderBoard();
+    testSendUserBetHistories();
   }
   
   private void testCrawlMatches() {
@@ -92,6 +95,27 @@ public class WorldCupTestApplication implements CommandLineRunner {
         );
       }
     }
+  }
+  
+  private void testSendLeaderBoard() {
+    var lines = List.of(
+        "*1. huynq* - 3 trận đúng",
+        "*2. phuongdv* - 5 trận đúng",
+        "*3. dattv* - 6 trận đúng"
+    );
+    slackService.publishMessage("test-world-cup", lines);
+  }
+  
+  private void testSendUserBetHistories() {
+    var lines = List.of(
+        "*1. 03/12/2022 (2h) - Serbia vs Thụy Sĩ* - kết quả: *Serbia thắng*, đã bet: `Serbia`",
+        "*2. 02/12/2022 (22h) - Ghana vs Uruguay* - kết quả: *Hoà*, đã bet: `Serbia`",
+        "*3. 02/12/2022 (2h) - Costa Rica vs Đức* - kết quả: *Hoà*, `không bet`",
+        "*4. 01/12/2022 (22h) - Croatia vs Bỉ* - kết quả: *Croatia*, `chọn muộn`",
+        "*5. 11/12/2022 (2h) - Anh vs Pháp*, kết quả: *chưa có*, đã bet: `Pháp`",
+        "Tổng kết: 5 trận đúng"
+    );
+    slackService.publishMessage("test-world-cup", lines);
   }
   
   private void testSendMessage() {

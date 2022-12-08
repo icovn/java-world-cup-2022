@@ -115,7 +115,7 @@ public class UserFacadeImpl implements UserFacade {
   
   @Override
   public void notifyNotBet() {
-    
+    log.info("(notifyNotBet)");
   }
   
   @Override

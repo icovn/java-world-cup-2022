@@ -45,14 +45,6 @@ public interface SlackService {
   List<User> getUsers();
   
   /**
-   * Publish leader board
-   * @param channelName Channel's name
-   * @param usersRank List of user rank
-   * @return
-   */
-  String publishLeaderBoard(@NonNull String channelName, List<String> usersRank);
-  
-  /**
    * Publish match rich message layout 
    * @param channelName Channel's name
    * @param text Text of the message
@@ -74,17 +66,12 @@ public interface SlackService {
   String publishMessage(@NonNull String channelName, @NonNull String text);
   
   /**
-   * Publish user's bet history
-   * @param channelName
-   * @param userId
-   * @param bets
+   * Publish leader board
+   * @param channelName Channel's name
+   * @param lines List of user rank
    * @return
    */
-  String publishUserBetHistory(
-      @NonNull String channelName, 
-      @NonNull String userId, 
-      List<String> bets
-  );
+  String publishMessage(@NonNull String channelName, List<String> lines);
   
   /**
    * Reply to the message

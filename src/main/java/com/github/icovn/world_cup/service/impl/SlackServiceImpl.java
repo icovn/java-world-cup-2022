@@ -19,7 +19,9 @@ import com.slack.api.methods.response.conversations.ConversationsListResponse;
 import com.slack.api.model.ConversationType;
 import com.slack.api.model.Message;
 import com.slack.api.model.User;
+import com.slack.api.model.block.LayoutBlock;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -190,12 +192,6 @@ public class SlackServiceImpl implements SlackService {
   }
   
   @Override
-  public String publishLeaderBoard(@NonNull String channelName, List<String> usersRank) {
-    log.info("(publishLeaderBoard)channelName: {}, usersRank: {}", channelName, usersRank);
-    return null;
-  }
-  
-  @Override
   public String publishMatch(
       @NonNull String channelName, 
       @NonNull String text,
@@ -263,15 +259,34 @@ public class SlackServiceImpl implements SlackService {
   }
   
   @Override
-  public String publishUserBetHistory(
-      @NonNull String channelName, 
-      @NonNull String userId,
-      List<String> bets
-  ) {
-    log.info(
-        "(publishUserBetHistory)channelName: {}, userId: {}, bets: {}", channelName, userId, bets
-    );
-    return null;
+  public String publishMessage(@NonNull String channelName, List<String> lines) {
+    log.info("(publishMessage)channelName: {}, lines: {}", channelName, lines);
+    var client = Slack.getInstance().methods();
+    
+    try {
+      var blocks = new ArrayList<LayoutBlock>();
+      blocks.add(divider());
+      for (var userRank: lines) {
+        blocks.add(section(section -> section.text(markdownText(userRank))));
+      }
+      blocks.add(divider());
+      var result = client.chatPostMessage(r -> r
+          .token(System.getenv("SLACK_BOT_TOKEN"))
+          .channel(channelName)
+          .blocks(blocks)
+      );
+      log.info("(publishMessage)result: {}", result);
+      
+      // throw exception when get failed
+      if (!result.isOk()) {
+        throw new PublishMessageFailedException(result.getError());
+      }
+      
+      return result.getTs();
+    } catch (SlackApiException | IOException ex) {
+      log.error("(publishMessage)ex: {}", getFullStackTrace(ex));
+      throw new PublishMessageFailedException(ex.getMessage());
+    }
   }
   
   @Override
