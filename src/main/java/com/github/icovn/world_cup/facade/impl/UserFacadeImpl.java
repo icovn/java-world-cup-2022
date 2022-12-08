@@ -133,6 +133,10 @@ public class UserFacadeImpl implements UserFacade {
         log.warn("(updateScore)userBet: {} --> MATCH_NOT_FOUND", userBet);
         continue;
       }
+      if (match.getResult() == null) {
+        log.warn("(updateScore)match: {} --> MATCH_NOT_FINISHED", userBet);
+        continue;
+      }
       
       if (userBet.getBet().equals(match.getResult())) {
         userBet.setResult(1);
@@ -145,8 +149,9 @@ public class UserFacadeImpl implements UserFacade {
   }
   
   @Override
-  public void viewLeaderBoard(@NonNull String userId) {
-    log.info("(viewLeaderBoard)userId: {}", userId);
+  public void viewLeaderBoard() {
+    log.info("(viewLeaderBoard)");
+    
   }
   
   @Override

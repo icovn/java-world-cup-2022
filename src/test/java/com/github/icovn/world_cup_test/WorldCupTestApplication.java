@@ -50,8 +50,9 @@ public class WorldCupTestApplication implements CommandLineRunner {
 //    initDataComponent.init();
 //    processOldDataFromSlack.loadUserBets();
   
-    testCrawlMatches();
+//    testCrawlMatches();
 //    testFilterMessages(false);
+    testGetUsers();
 //    testSendLeaderBoard();
 //    testSendUserBetHistories();
   }
@@ -95,6 +96,13 @@ public class WorldCupTestApplication implements CommandLineRunner {
             "(run)user: {}, text: {}, ts: {}", reply.getUser(), reply.getText(), reply.getTs()
         );
       }
+    }
+  }
+  
+  private void testGetUsers() {
+    var users = slackService.getUsers();
+    for (var user: users) {
+      log.info("(testGetUsers)user: {}", user);
     }
   }
   
