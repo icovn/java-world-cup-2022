@@ -88,7 +88,7 @@ public class MatchFacadeImpl implements MatchFacade {
     log.info("(postMatches)currentDate: {}", currentDate);
     
     for (var match: matches) {
-      log.info("(postMatches)match: {}", match);
+      log.info("(postMatches)match dat: {}, detail: {}", match.getDate(), match);
       if (currentDate > match.getDate()) {
         continue;
       }

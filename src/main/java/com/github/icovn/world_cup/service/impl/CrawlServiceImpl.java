@@ -140,11 +140,11 @@ public class CrawlServiceImpl implements CrawlService {
       return MatchType.EIGHTH_FINAL;
     }
   
-    if (input.equals("Vòng tứ kết")) {
+    if (List.of("Vòng tứ kết", "Tứ kết 1", "Tứ kết 2", "Tứ kết 3", "Tứ kết 4").contains(input)) {
       return MatchType.QUARTER_FINAL;
     }
   
-    if (input.equals("Vòng bán kết")) {
+    if (List.of("Vòng bán kết", "Bán kết 1", "Bán kết 2").contains(input)) {
       return MatchType.SEMI_FINAL;
     }
   
