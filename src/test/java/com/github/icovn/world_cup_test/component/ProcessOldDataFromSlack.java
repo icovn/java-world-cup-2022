@@ -3,8 +3,10 @@ package com.github.icovn.world_cup_test.component;
 import com.github.icovn.world_cup.constant.BetStatus;
 import com.github.icovn.world_cup.entity.MatchUserBet;
 import com.github.icovn.world_cup.entity.Team;
+import com.github.icovn.world_cup.entity.User;
 import com.github.icovn.world_cup.repository.MatchRepository;
 import com.github.icovn.world_cup.repository.TeamRepository;
+import com.github.icovn.world_cup.repository.UserRepository;
 import com.github.icovn.world_cup.service.SlackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,21 @@ public class ProcessOldDataFromSlack {
   private final MatchRepository matchRepository;
   private final SlackService slackService;
   private final TeamRepository teamRepository;
+  private final UserRepository userRepository;
+  
+  public void loadUsers() {
+    var users = slackService.getUsers();
+    for (var user: users) {
+      var existUser = userRepository.findById(user.getId()).orElse(null);
+      if (existUser == null) {
+        var userFullName = user.getProfile().getDisplayName();
+        if (userFullName.isBlank()) {
+          userFullName = user.getName();
+        }
+        userRepository.save(User.of(user.getId(), userFullName));
+      }
+    }
+  }
   
   public void loadUserBets() {
     log.info("(loadUserBets)");

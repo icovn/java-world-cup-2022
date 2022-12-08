@@ -48,11 +48,12 @@ public class WorldCupTestApplication implements CommandLineRunner {
     log.info("(run)commit id: {}, message: {} .....", commitId, commitMessage);
   
 //    initDataComponent.init();
+    processOldDataFromSlack.loadUsers();
 //    processOldDataFromSlack.loadUserBets();
   
 //    testCrawlMatches();
 //    testFilterMessages(false);
-    testGetUsers();
+//    testGetUsers();
 //    testSendLeaderBoard();
 //    testSendUserBetHistories();
   }
