@@ -125,6 +125,10 @@ public class MatchFacadeImpl implements MatchFacade {
   
     for (var match: matches) {
       log.info("(updateMatchesResult)match: {}", match);
+      if (match.getTeam1Goals() < 0 || match.getTeam2Goals() < 0) {
+        continue;
+      }
+      
       var team1Id = Team.getTeamIdByName(match.getTeam1Name(), teams);
       if (team1Id == null) {
         throw new TeamNotFoundException(match.getTeam1Name());
