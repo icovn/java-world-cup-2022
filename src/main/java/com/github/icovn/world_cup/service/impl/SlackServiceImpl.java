@@ -12,6 +12,7 @@ import com.github.icovn.world_cup.exception.GetRepliesFailedException;
 import com.github.icovn.world_cup.exception.GetUsersFailedException;
 import com.github.icovn.world_cup.exception.PublishMessageFailedException;
 import com.github.icovn.world_cup.exception.ReplyMessageFailedException;
+import com.github.icovn.world_cup.model.SlackMessageSection;
 import com.github.icovn.world_cup.service.SlackService;
 import com.slack.api.Slack;
 import com.slack.api.methods.SlackApiException;
@@ -20,6 +21,9 @@ import com.slack.api.model.ConversationType;
 import com.slack.api.model.Message;
 import com.slack.api.model.User;
 import com.slack.api.model.block.LayoutBlock;
+import com.slack.api.model.block.element.BlockElements;
+import com.slack.api.model.block.element.ImageElement;
+import com.slack.api.model.block.element.ImageElement.ImageElementBuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -259,21 +263,45 @@ public class SlackServiceImpl implements SlackService {
   }
   
   @Override
-  public String publishMessage(@NonNull String channelName, List<String> lines) {
-    log.info("(publishMessage)channelName: {}, lines: {}", channelName, lines);
+  public String publishMessage(
+      @NonNull String channelName,
+      String title,
+      List<SlackMessageSection> sections
+  ) {
+    log.info(
+        "(publishMessage)channelName: {}, title: {}, sections: {}", channelName, title, sections
+    );
     var client = Slack.getInstance().methods();
     
     try {
       var blocks = new ArrayList<LayoutBlock>();
-      blocks.add(divider());
-      for (var userRank: lines) {
-        blocks.add(section(section -> section.text(markdownText(userRank))));
+      
+      if (title != null && !title.isBlank()) {
+        blocks.add(section(section -> section.text(markdownText(title))));
       }
-      blocks.add(divider());
+      
+      for (var slackSection: sections) {
+        if (slackSection.getImage() != null && !slackSection.getImage().isBlank()) {
+          blocks.add(section(section -> section
+              .text(markdownText(slackSection.getText()))
+              .accessory(ImageElement.builder()
+                  .imageUrl(slackSection.getImage())
+                  .altText(slackSection.getText())
+                  .build()
+              )
+          ));
+        } else {
+          blocks.add(section(section -> section
+              .text(markdownText(slackSection.getText()))
+          ));
+        }
+      }
+      
       var result = client.chatPostMessage(r -> r
           .token(System.getenv("SLACK_BOT_TOKEN"))
           .channel(channelName)
           .blocks(blocks)
+          .text("abc")
       );
       log.info("(publishMessage)result: {}", result);
       

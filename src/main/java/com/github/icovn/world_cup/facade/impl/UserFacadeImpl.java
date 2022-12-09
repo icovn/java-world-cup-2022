@@ -1,16 +1,22 @@
 package com.github.icovn.world_cup.facade.impl;
 
+import com.github.icovn.util.MapperUtil;
 import com.github.icovn.world_cup.constant.BetStatus;
 import com.github.icovn.world_cup.entity.Match;
 import com.github.icovn.world_cup.entity.MatchUserBet;
 import com.github.icovn.world_cup.exception.MatchNotFoundException;
 import com.github.icovn.world_cup.exception.TeamNotFoundException;
 import com.github.icovn.world_cup.facade.UserFacade;
+import com.github.icovn.world_cup.model.SlackMessageSection;
 import com.github.icovn.world_cup.repository.MatchRepository;
 import com.github.icovn.world_cup.repository.MatchUserBetRepository;
 import com.github.icovn.world_cup.repository.TeamRepository;
 import com.github.icovn.world_cup.repository.TournamentUserBoardRepository;
+import com.github.icovn.world_cup.repository.UserRepository;
 import com.github.icovn.world_cup.service.SlackService;
+import com.github.icovn.world_cup.util.DateTimeUtil;
+import java.util.ArrayList;
+import java.util.Objects;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,17 +28,23 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class UserFacadeImpl implements UserFacade {
   
+  @Value("${application.default.bet_right_image_url:https://t4.ftcdn.net/jpg/02/02/78/81/360_F_202788149_9sndfcPPme9zRtstjROSmyLFma2UMYaM.jpg}")
+  private String betRight;
+  
+  @Value("${application.default.bet_wrong_image_url:https://as2.ftcdn.net/v2/jpg/02/01/83/17/1000_F_201831763_OhQZdsAmuHkcBLpCFQvL7vznoKSJpcD3.jpg}")
+  private String betWrong;
+  
+  @Value("${application.default.bet_match_not_start_image_url:https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Blue_question_mark_icon.svg/2048px-Blue_question_mark_icon.svg.png}")
+  private String betMatchNotStart;
+  
   @Value("${application.default.world_cup_channel_name:test-world-cup}")
   private String channelName;
-  
-  @Value("${application.default.world_cup_tournament_id:2022_11_QATAR}")
-  private String tournamentId;
   
   private final MatchRepository matchRepository;
   private final MatchUserBetRepository matchUserBetRepository;
   private final SlackService slackService;
   private final TeamRepository teamRepository;
-  private final TournamentUserBoardRepository tournamentUserBoardRepository;
+  private final UserRepository userRepository;
   
   @Override
   public void bet(
@@ -148,14 +160,79 @@ public class UserFacadeImpl implements UserFacade {
     }
   }
   
+  
   @Override
-  public void viewLeaderBoard() {
-    log.info("(viewLeaderBoard)");
+  public void viewLeaderBoard(@NonNull String channelName) {
+    log.info("(viewLeaderBoard)channelName: {}", channelName);
     
   }
   
   @Override
-  public void viewMyBet(@NonNull String userId) {
-    log.info("(viewMyBet)userId: {}", userId);
+  public void viewMyBet(@NonNull String userId, @NonNull String channelName) {
+    log.info("(viewMyBet)userId: {}, channelName: {}", userId, channelName);
+    
+    var user = userRepository.findById(userId).orElse(null);
+    if (user == null) {
+      log.error("(viewMyBet)userId: {} --> NOT_EXIST", userId);
+      return;
+    }
+    
+    var userBets = matchUserBetRepository.findHistory(userId);
+    log.info("(viewMyBet)userBets: {}", userBets.size());
+    
+    var index = 1;
+    var numberOfBetRight = 0;
+    var sections = new ArrayList<SlackMessageSection>();
+    for (var userBet: userBets) {
+      log.debug("(viewMyBet)userBet: {}", MapperUtil.toJson(userBet));
+      if (userBet.getDate() == null) {
+        continue;
+      }
+      
+      var matchResult = "Hòa";
+      if (!Objects.equals(userBet.getMatchResult(), Match.DRAW_RESULT)) {
+        if (Objects.equals(userBet.getMatchResult(), userBet.getTeam1Id())) {
+          matchResult = userBet.getTeam1Name() + " thắng";
+        } else {
+          matchResult = userBet.getTeam2Name() + " thắng";
+        }
+      }
+  
+      var userBetResult = "Hòa";
+      if (!Objects.equals(userBet.getUserBet(), Match.DRAW_RESULT)) {
+        if (Objects.equals(userBet.getUserBet(), userBet.getTeam1Id())) {
+          userBetResult = userBet.getTeam1Name() + " thắng";
+        } else {
+          userBetResult = userBet.getTeam2Name() + " thắng";
+        }
+      }
+      
+      var text = String.format(
+          "*%s. %s %s - %s vs %s*\n- kết quả: `%s`\n- đã bet: `%s` lúc %s",
+          index,
+          DateTimeUtil.getDateString(userBet.getDate()),
+          DateTimeUtil.getTimeString(userBet.getStartTime()),
+          userBet.getTeam1Name(),
+          userBet.getTeam2Name(),
+          matchResult,
+          userBetResult,
+          DateTimeUtil.convertTimestampToString(userBet.getBetAt())
+      );
+      
+      var betImage = betMatchNotStart;
+      if (userBet.getBetResult() == 0) {
+        betImage = betWrong;
+      }
+      if (userBet.getBetResult() > 0) {
+        betImage = betRight;
+        numberOfBetRight++;
+      }
+      
+      sections.add(SlackMessageSection.of(text, betImage));
+      index++;
+    }
+    
+    var title = "Lịch sử cược của *" + user.getFullName() + "*: " + numberOfBetRight + " trận đúng";
+    slackService.publishMessage(channelName, title, sections);
   }
 }

@@ -2,6 +2,7 @@ package com.github.icovn.world_cup.entity;
 
 import com.github.icovn.util.DateUtil;
 import com.github.icovn.world_cup.constant.MatchType;
+import com.github.icovn.world_cup.util.DateTimeUtil;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -50,27 +51,17 @@ public class Match extends BaseEntity {
   
   @Transient
   public String getDateString() {
-    var matchDate = DateUtil.toDate(Integer.toString(date), "yyyyMMdd");
-    return DateUtil.toString(matchDate, "dd/MM/yyyy");
+    return DateTimeUtil.getDateString(date);
   }
   
   @Transient
   public long getStartTimeInTimestamp() {
-    var hour = startTime/60;
-    var minutes = startTime % 60;
-    var dateAndTime = date + " " + hour + ":" + minutes;
-    var matchDate = DateUtil.toDate(dateAndTime, "yyyyMMdd H:m");
-    return matchDate.getTime();
+    return DateTimeUtil.getStartTimeInTimestamp(date, startTime);
   }
   
   @Transient
   public String getTimeString() {
-    var hour = startTime/60;
-    var minutes = startTime % 60;
-    if (minutes == 0) {
-      return "(" + hour + "h" + ")";  
-    } 
-    return "(" + hour + "h:" + minutes + ")";
+    return DateTimeUtil.getTimeString(startTime);
   }
   
   public static Match of(

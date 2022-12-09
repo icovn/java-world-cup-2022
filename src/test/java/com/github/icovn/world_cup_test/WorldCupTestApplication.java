@@ -1,11 +1,13 @@
 package com.github.icovn.world_cup_test;
 
+import com.github.icovn.world_cup.model.SlackMessageSection;
 import com.github.icovn.world_cup.service.CrawlService;
 import com.github.icovn.world_cup.service.SlackService;
 import com.github.icovn.world_cup_test.component.InitDataComponent;
 import com.github.icovn.world_cup_test.component.ProcessOldDataFromSlack;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,14 +50,14 @@ public class WorldCupTestApplication implements CommandLineRunner {
     log.info("(run)commit id: {}, message: {} .....", commitId, commitMessage);
   
 //    initDataComponent.init();
-    processOldDataFromSlack.loadUsers();
+//    processOldDataFromSlack.loadUsers();
 //    processOldDataFromSlack.loadUserBets();
   
 //    testCrawlMatches();
 //    testFilterMessages(false);
 //    testGetUsers();
 //    testSendLeaderBoard();
-//    testSendUserBetHistories();
+    testSendUserBetHistories();
   }
   
   private void testCrawlMatches() {
@@ -113,19 +115,28 @@ public class WorldCupTestApplication implements CommandLineRunner {
         "*2. phuongdv* - 5 trận đúng",
         "*3. dattv* - 6 trận đúng"
     );
-    slackService.publishMessage("test-world-cup", lines);
+    slackService.publishMessage(
+        "test-world-cup", 
+        "Leader board", 
+        lines.stream().map(SlackMessageSection::of).collect(Collectors.toList())
+    );
   }
   
   private void testSendUserBetHistories() {
     var lines = List.of(
-        "*1. 03/12/2022 (2h) - Serbia vs Thụy Sĩ* - kết quả: *Serbia thắng*, đã bet: `Serbia`",
-        "*2. 02/12/2022 (22h) - Ghana vs Uruguay* - kết quả: *Hoà*, đã bet: `Serbia`",
-        "*3. 02/12/2022 (2h) - Costa Rica vs Đức* - kết quả: *Hoà*, `không bet`",
-        "*4. 01/12/2022 (22h) - Croatia vs Bỉ* - kết quả: *Croatia*, `chọn muộn`",
-        "*5. 11/12/2022 (2h) - Anh vs Pháp*, kết quả: *chưa có*, đã bet: `Pháp`",
-        "Tổng kết: 5 trận đúng"
+        "*1. 03/12/2022 (2h) - Serbia vs Thụy Sĩ*\n- kết quả: `Serbia thắng`\n- đã bet: `Serbia` lúc 19:30 02/12/2022\n- `sai`",
+        "*2. 03/12/2022 (2h) - Serbia vs Thụy Sĩ*\n- kết quả: `Serbia thắng`\n- đã bet: `Serbia` lúc 19:30 02/12/2022\n- `đúng`"
     );
-    slackService.publishMessage("test-world-cup", lines);
+    slackService.publishMessage(
+        "test-world-cup", 
+        "Lịch sử cược của *HuyNQ*: 12 trận đúng",
+        lines.stream().map(
+            o -> SlackMessageSection.of(
+                o, 
+                "https://as2.ftcdn.net/v2/jpg/02/01/83/17/1000_F_201831763_OhQZdsAmuHkcBLpCFQvL7vznoKSJpcD3.jpg"
+            )
+        ).collect(Collectors.toList())
+    );
   }
   
   private void testSendMessage() {

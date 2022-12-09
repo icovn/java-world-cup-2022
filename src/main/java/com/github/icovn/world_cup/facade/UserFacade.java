@@ -27,7 +27,7 @@ public interface UserFacade {
    */
   void updateScore();
   
-  void viewLeaderBoard();
+  void viewLeaderBoard(@NonNull String channelName);
   
-  void viewMyBet(@NonNull String userId);
+  void viewMyBet(@NonNull String userId, @NonNull String channelName);
 }

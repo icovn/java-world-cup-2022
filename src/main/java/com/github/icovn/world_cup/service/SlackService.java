@@ -1,5 +1,6 @@
 package com.github.icovn.world_cup.service;
 
+import com.github.icovn.world_cup.model.SlackMessageSection;
 import com.slack.api.model.Message;
 import com.slack.api.model.User;
 import java.util.List;
@@ -52,7 +53,7 @@ public interface SlackService {
    * @return
    */
   String publishMatch(
-      @NonNull String channelName, 
+      @NonNull String channelName,
       @NonNull String text, 
       Map<String, String> choices
   );
@@ -68,10 +69,15 @@ public interface SlackService {
   /**
    * Publish leader board
    * @param channelName Channel's name
-   * @param lines List of user rank
+   * \@param title Message's title
+   * @param sections List of message's sections
    * @return
    */
-  String publishMessage(@NonNull String channelName, List<String> lines);
+  String publishMessage(
+      @NonNull String channelName, 
+      String title, 
+      List<SlackMessageSection> sections
+  );
   
   /**
    * Reply to the message
