@@ -1,22 +1,30 @@
 package com.github.icovn.world_cup_test.component;
 
 import com.github.icovn.world_cup.constant.BetStatus;
+import com.github.icovn.world_cup.entity.Match;
 import com.github.icovn.world_cup.entity.MatchUserBet;
 import com.github.icovn.world_cup.entity.Team;
 import com.github.icovn.world_cup.entity.User;
 import com.github.icovn.world_cup.repository.MatchRepository;
+import com.github.icovn.world_cup.repository.MatchUserBetRepository;
 import com.github.icovn.world_cup.repository.TeamRepository;
 import com.github.icovn.world_cup.repository.UserRepository;
 import com.github.icovn.world_cup.service.SlackService;
+import java.sql.SQLIntegrityConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class ProcessOldDataFromSlack {
-  
+
+  @Autowired
+  private MatchUserBetRepository matchUserBetRepository;
+
   private final MatchRepository matchRepository;
   private final SlackService slackService;
   private final TeamRepository teamRepository;
@@ -67,30 +75,38 @@ public class ProcessOldDataFromSlack {
       
       var replies = slackService.getReplies(channelId, message.getTs());
       for (var reply: replies) {
-        var isValid = Long.parseLong(reply.getTs().split("\\.")[0]) < match.getStartTimeInTimestamp();
-        var userBetTeam = Team.getTeamIdByCode(reply.getText(), teams);
-        log.info(
-            "(loadUserBets)user: {}, text: {}, ts: {}, isValid: {}, userBetTeam: {}", 
-            reply.getUser(), reply.getText(), reply.getTs(), isValid, userBetTeam
-        );
-        
-        if (userBetTeam == null) {
-          log.warn("(loadUserBets)team: {}, TEAM_NOT_EXIST", reply.getText());
-          continue;
-        }
-  
-        if (isValid) {
-          var matchUserBet = MatchUserBet.of(
-              match.getId(), reply.getUser(), userBetTeam
+        try {
+          var isValid = Long.parseLong(reply.getTs().split("\\.")[0]) < match.getStartTimeInTimestamp();
+          var userBetTeam = Team.getTeamIdByCode(reply.getText(), teams);
+          log.info(
+              "(loadUserBets)user: {}, text: {}, ts: {}, isValid: {}, userBetTeam: {}",
+              reply.getUser(), reply.getText(), reply.getTs(), isValid, userBetTeam
           );
+
+          if (userBetTeam == null) {
+            if (reply.getText().equalsIgnoreCase("hoà") || reply.getText().equalsIgnoreCase("hòa")) {
+              userBetTeam = Match.DRAW_RESULT;
+            } else {
+              log.warn("(loadUserBets)team: {}, TEAM_NOT_EXIST", reply.getText());
+              continue;
+            }
+          }
+
+          MatchUserBet matchUserBet;
+          if (isValid) {
+            matchUserBet = MatchUserBet.of(
+                match.getId(), reply.getUser(), userBetTeam
+            );
+          } else {
+            matchUserBet = MatchUserBet.of(
+                match.getId(), reply.getUser(), BetStatus.LATE_BET
+            );
+          }
+          matchUserBetRepository.save(matchUserBet);
           log.info("(loadUserBets)matchUserBet: {}", matchUserBet);
-        } else {
-          var matchUserBet = MatchUserBet.of(
-              match.getId(), reply.getUser(), BetStatus.LATE_BET
-          );
-          log.info("(loadUserBets)matchUserBet: {}", matchUserBet);
+        } catch (Exception ex) {
+          log.warn("(loadUserBets)ex: {}", ex.getMessage());
         }
-        
       }
     }
   }
