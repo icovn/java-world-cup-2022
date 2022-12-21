@@ -39,4 +39,15 @@ public class TournamentUserBoard extends BaseEntity {
     tournamentUserBoard.setUserId(userId);
     return tournamentUserBoard;
   }
+
+  public static TournamentUserBoard of(
+      @NonNull String tournamentId,
+      @NonNull String userId,
+      int rankIndex,
+      int score) {
+    var tournamentUserBoard = TournamentUserBoard.of(tournamentId, userId);
+    tournamentUserBoard.setRankIndex(rankIndex);
+    tournamentUserBoard.setScore(score);
+    return tournamentUserBoard;
+  }
 }

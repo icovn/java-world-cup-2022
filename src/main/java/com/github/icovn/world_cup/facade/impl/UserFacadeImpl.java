@@ -4,6 +4,7 @@ import com.github.icovn.util.MapperUtil;
 import com.github.icovn.world_cup.constant.BetStatus;
 import com.github.icovn.world_cup.entity.Match;
 import com.github.icovn.world_cup.entity.MatchUserBet;
+import com.github.icovn.world_cup.entity.TournamentUserBoard;
 import com.github.icovn.world_cup.exception.MatchNotFoundException;
 import com.github.icovn.world_cup.exception.TeamNotFoundException;
 import com.github.icovn.world_cup.facade.UserFacade;
@@ -11,6 +12,7 @@ import com.github.icovn.world_cup.model.SlackMessageSection;
 import com.github.icovn.world_cup.repository.MatchRepository;
 import com.github.icovn.world_cup.repository.MatchUserBetRepository;
 import com.github.icovn.world_cup.repository.TeamRepository;
+import com.github.icovn.world_cup.repository.TournamentUserBoardRepository;
 import com.github.icovn.world_cup.repository.UserRepository;
 import com.github.icovn.world_cup.service.SlackService;
 import com.github.icovn.world_cup.util.DateTimeUtil;
@@ -27,7 +29,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Slf4j
 public class UserFacadeImpl implements UserFacade {
-  
+
+  private final TournamentUserBoardRepository tournamentUserBoardRepository;
+
   @Value("${application.default.bet_right_image_url:https://t4.ftcdn.net/jpg/02/02/78/81/360_F_202788149_9sndfcPPme9zRtstjROSmyLFma2UMYaM.jpg}")
   private String betRight;
   
@@ -39,6 +43,9 @@ public class UserFacadeImpl implements UserFacade {
   
   @Value("${application.default.world_cup_channel_name:test-world-cup}")
   private String channelName;
+
+  @Value("${application.default.world_cup_tournament_id:2022_11_QATAR}")
+  private String tournamentId;
   
   private final MatchRepository matchRepository;
   private final MatchUserBetRepository matchUserBetRepository;
@@ -163,6 +170,28 @@ public class UserFacadeImpl implements UserFacade {
       log.info("(updateScore)userBet: {}, match: {}", userBet.getBet(), match.getResult());
       matchUserBetRepository.save(userBet);
     }
+
+    var userScores = matchUserBetRepository.findScore();
+    for (var i=0; i<userScores.size(); i++) {
+      var tournamentUser = tournamentUserBoardRepository.findFirstByTournamentIdAndUserId(
+          tournamentId,
+          userScores.get(i).getUserId()
+      );
+      if (tournamentUser == null) {
+        tournamentUserBoardRepository.save(
+            TournamentUserBoard.of(
+                tournamentId,
+                userScores.get(i).getUserId(),
+                userScores.get(i).getScore(),
+                i+1
+            )
+        );
+      } else {
+        tournamentUser.setScore(userScores.get(i).getScore());
+        tournamentUser.setRankIndex(i+1);
+        tournamentUserBoardRepository.save(tournamentUser);
+      }
+    }
   }
   
 
@@ -170,7 +199,28 @@ public class UserFacadeImpl implements UserFacade {
   @Override
   public void viewLeaderBoard(@NonNull String channelName) {
     log.info("(viewLeaderBoard)channelName: {}", channelName);
-    
+
+    var userScores = tournamentUserBoardRepository.findAllByTournamentId(tournamentId);
+    if (userScores.isEmpty()) {
+      return;
+    }
+
+    StringBuilder message = new StringBuilder();
+    for (var userScore: userScores) {
+      var user = userRepository.findById(userScore.getUserId()).orElse(null);
+      if (user == null) {
+        continue;
+      }
+
+      message.append(String.format(
+          "*%s. %s* - %s trận đúng\n",
+          userScore.getRankIndex(),
+          user.getFullName(),
+          userScore.getScore()
+      ));
+    }
+
+    slackService.publishMessage(channelName, message.toString());
   }
 
   @Async

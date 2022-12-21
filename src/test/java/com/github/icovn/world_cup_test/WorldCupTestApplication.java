@@ -111,9 +111,9 @@ public class WorldCupTestApplication implements CommandLineRunner {
   
   private void testSendLeaderBoard() {
     var lines = List.of(
-        "*1. huynq* - 3 trận đúng",
-        "*2. phuongdv* - 5 trận đúng",
-        "*3. dattv* - 6 trận đúng"
+        "*1. huynq* - 3 trận đúng\n",
+        "*2. phuongdv* - 5 trận đúng\n",
+        "*3. dattv* - 6 trận đúng\n"
     );
     slackService.publishMessage(
         "test-world-cup", 

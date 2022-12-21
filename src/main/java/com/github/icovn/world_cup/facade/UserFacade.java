@@ -23,7 +23,7 @@ public interface UserFacade {
   void notifyNotBet();
   
   /**
-   * Update user bet result and core in board
+   * Update user bet result and score in board
    */
   void updateScore();
   
