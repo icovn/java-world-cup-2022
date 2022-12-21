@@ -24,7 +24,7 @@ public interface MatchUserBetRepository extends JpaRepository<MatchUserBet, Stri
   )
   List<MatchUserBetDTO> findHistory(@Param("userId") String userId);
 
-  @Query("SELECT SUM(result) AS score, userId FROM MatchUserBet "
+  @Query("SELECT SUM(result) AS score, userId as userId FROM MatchUserBet "
       + "GROUP BY userId "
       + "ORDER BY score DESC ")
   List<MatchUserBetResultDTO> findScore();
