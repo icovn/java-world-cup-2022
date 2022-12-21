@@ -201,7 +201,7 @@ public class SlackServiceImpl implements SlackService {
       @NonNull String text,
       Map<String, String> choices
   ) {
-    log.info("(publishMessage)channelName: {}, text: {}, choices: {}}", channelName, text, choices);
+    log.info("(publishMessage)channelName: {}, text: {}, choices: {}", channelName, text, choices);
     var client = Slack.getInstance().methods();
   
     try {
@@ -263,7 +263,7 @@ public class SlackServiceImpl implements SlackService {
   }
   
   @Override
-  public String publishMessage(
+  public void publishMessage(
       @NonNull String channelName,
       String title,
       List<SlackMessageSection> sections
@@ -279,7 +279,8 @@ public class SlackServiceImpl implements SlackService {
       if (title != null && !title.isBlank()) {
         blocks.add(section(section -> section.text(markdownText(title))));
       }
-      
+
+      var count = 1;
       for (var slackSection: sections) {
         if (slackSection.getImage() != null && !slackSection.getImage().isBlank()) {
           blocks.add(section(section -> section
@@ -295,22 +296,29 @@ public class SlackServiceImpl implements SlackService {
               .text(markdownText(slackSection.getText()))
           ));
         }
+
+        if (count % 45 == 0 || count == sections.size()) {
+          var result = client.chatPostMessage(r -> r
+              .token(System.getenv("SLACK_BOT_TOKEN"))
+              .channel(channelName)
+              .blocks(blocks)
+              .text("^^")
+          );
+          log.info("(publishMessage)result: {}", result);
+
+          // throw exception when get failed
+          if (!result.isOk()) {
+            throw new PublishMessageFailedException(result.getError());
+          }
+
+          blocks.clear();
+        }
+
+
+        count++;
       }
       
-      var result = client.chatPostMessage(r -> r
-          .token(System.getenv("SLACK_BOT_TOKEN"))
-          .channel(channelName)
-          .blocks(blocks)
-          .text("abc")
-      );
-      log.info("(publishMessage)result: {}", result);
-      
-      // throw exception when get failed
-      if (!result.isOk()) {
-        throw new PublishMessageFailedException(result.getError());
-      }
-      
-      return result.getTs();
+
     } catch (SlackApiException | IOException ex) {
       log.error("(publishMessage)ex: {}", getFullStackTrace(ex));
       throw new PublishMessageFailedException(ex.getMessage());

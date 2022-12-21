@@ -36,3 +36,4 @@ ORDER BY m.date DESC, m.start_time DESC;
 -- UPDATE wc_tournament SET created_at = UNIX_TIMESTAMP() * 1000, updated_at = UNIX_TIMESTAMP() * 1000;
 -- UPDATE wc_tournament_team SET created_at = UNIX_TIMESTAMP() * 1000, updated_at = UNIX_TIMESTAMP() * 1000;
 -- UPDATE wc_match SET created_at = UNIX_TIMESTAMP() * 1000, updated_at = UNIX_TIMESTAMP() * 1000;
+-- UPDATE wc_match_user_bet SET STATUS = 0 WHERE STATUS IS NULL;

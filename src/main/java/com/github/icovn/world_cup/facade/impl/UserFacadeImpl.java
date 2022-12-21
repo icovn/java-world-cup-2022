@@ -11,7 +11,6 @@ import com.github.icovn.world_cup.model.SlackMessageSection;
 import com.github.icovn.world_cup.repository.MatchRepository;
 import com.github.icovn.world_cup.repository.MatchUserBetRepository;
 import com.github.icovn.world_cup.repository.TeamRepository;
-import com.github.icovn.world_cup.repository.TournamentUserBoardRepository;
 import com.github.icovn.world_cup.repository.UserRepository;
 import com.github.icovn.world_cup.service.SlackService;
 import com.github.icovn.world_cup.util.DateTimeUtil;
@@ -21,6 +20,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -149,24 +149,31 @@ public class UserFacadeImpl implements UserFacade {
         log.warn("(updateScore)match: {} --> MATCH_NOT_FINISHED", userBet);
         continue;
       }
-      
-      if (userBet.getBet().equals(match.getResult())) {
-        userBet.setResult(1);
-      } else {
+
+      if (userBet.getStatus().equals(BetStatus.LATE_BET)) {
         userBet.setResult(0);
+      } else {
+        if (userBet.getBet().equals(match.getResult())) {
+          userBet.setResult(1);
+        } else {
+          userBet.setResult(0);
+        }
       }
+
       log.info("(updateScore)userBet: {}, match: {}", userBet.getBet(), match.getResult());
       matchUserBetRepository.save(userBet);
     }
   }
   
-  
+
+  @Async
   @Override
   public void viewLeaderBoard(@NonNull String channelName) {
     log.info("(viewLeaderBoard)channelName: {}", channelName);
     
   }
-  
+
+  @Async
   @Override
   public void viewMyBet(@NonNull String userId, @NonNull String channelName) {
     log.info("(viewMyBet)userId: {}, channelName: {}", userId, channelName);
@@ -193,7 +200,8 @@ public class UserFacadeImpl implements UserFacade {
       if (!Objects.equals(userBet.getMatchResult(), Match.DRAW_RESULT)) {
         if (Objects.equals(userBet.getMatchResult(), userBet.getTeam1Id())) {
           matchResult = userBet.getTeam1Name() + " thắng";
-        } else {
+        }
+        if (Objects.equals(userBet.getMatchResult(), userBet.getTeam2Id())) {
           matchResult = userBet.getTeam2Name() + " thắng";
         }
       }
@@ -202,7 +210,8 @@ public class UserFacadeImpl implements UserFacade {
       if (!Objects.equals(userBet.getUserBet(), Match.DRAW_RESULT)) {
         if (Objects.equals(userBet.getUserBet(), userBet.getTeam1Id())) {
           userBetResult = userBet.getTeam1Name() + " thắng";
-        } else {
+        }
+        if (Objects.equals(userBet.getUserBet(), userBet.getTeam2Id())) {
           userBetResult = userBet.getTeam2Name() + " thắng";
         }
       }

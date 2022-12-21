@@ -73,7 +73,7 @@ public interface SlackService {
    * @param sections List of message's sections
    * @return
    */
-  String publishMessage(
+  void publishMessage(
       @NonNull String channelName, 
       String title, 
       List<SlackMessageSection> sections

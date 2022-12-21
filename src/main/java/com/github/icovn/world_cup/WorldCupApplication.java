@@ -18,8 +18,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableAsync
 @EnableJpaAuditing
 @EnableScheduling
 @Slf4j
@@ -32,7 +34,9 @@ public class WorldCupApplication implements CommandLineRunner {
   private String commitMessage;
   @Value("${application.mode:}")
   private String mode;
-  
+
+  @Value("${slack.port:3000}")
+  private Integer port;
   @Bean
   public AuditorAware<String> auditorAware() {
     return new CustomAuditorAware();
@@ -86,7 +90,7 @@ public class WorldCupApplication implements CommandLineRunner {
       return ctx.ack();
     });
   
-    var server = new SlackAppServer(app);
+    var server = new SlackAppServer(app, port);
     server.start();
   }
 }

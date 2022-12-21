@@ -51,7 +51,7 @@ public class WorldCupTestApplication implements CommandLineRunner {
   
 //    initDataComponent.init();
 //    processOldDataFromSlack.loadUsers();
-    processOldDataFromSlack.loadUserBets();
+//    processOldDataFromSlack.loadUserBets();
   
 //    testCrawlMatches();
 //    testFilterMessages(false);
