@@ -239,7 +239,8 @@ public class SlackServiceImpl implements SlackService {
   
   @Override
   public String publishMessage(@NonNull String channelName, @NonNull String text) {
-    log.info("(publishMessage)channelName: {}, text: {}", channelName, text);
+    log.info("(publishMessage)channelName: {}", channelName);
+    log.debug("(publishMessage)channelName: {}, text: {}", channelName, text);
     var client = Slack.getInstance().methods();
     
     try {

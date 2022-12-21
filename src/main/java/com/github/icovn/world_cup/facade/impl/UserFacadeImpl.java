@@ -146,7 +146,7 @@ public class UserFacadeImpl implements UserFacade {
     log.info("(updateScore)userBets: {}", userBets.size());
     
     for (var userBet: userBets) {
-      log.info("(updateScore)userBet: {}", userBet);
+      log.debug("(updateScore)userBet: {}", userBet);
       var match = Match.getMatch(userBet.getMatchId(), matches);
       if (match == null) {
         log.warn("(updateScore)userBet: {} --> MATCH_NOT_FOUND", userBet);
@@ -173,6 +173,7 @@ public class UserFacadeImpl implements UserFacade {
 
     var userScores = matchUserBetRepository.findScore();
     for (var i=0; i<userScores.size(); i++) {
+      log.debug("(updateScore)userScore: {}", userScores.get(i));
       var tournamentUser = tournamentUserBoardRepository.findFirstByTournamentIdAndUserId(
           tournamentId,
           userScores.get(i).getUserId()
@@ -182,8 +183,8 @@ public class UserFacadeImpl implements UserFacade {
             TournamentUserBoard.of(
                 tournamentId,
                 userScores.get(i).getUserId(),
-                userScores.get(i).getScore(),
-                i+1
+                i+1,
+                userScores.get(i).getScore()
             )
         );
       } else {

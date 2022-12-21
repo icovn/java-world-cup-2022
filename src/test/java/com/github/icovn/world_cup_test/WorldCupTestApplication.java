@@ -1,5 +1,6 @@
 package com.github.icovn.world_cup_test;
 
+import com.github.icovn.world_cup.facade.UserFacade;
 import com.github.icovn.world_cup.model.SlackMessageSection;
 import com.github.icovn.world_cup.service.CrawlService;
 import com.github.icovn.world_cup.service.SlackService;
@@ -40,6 +41,8 @@ public class WorldCupTestApplication implements CommandLineRunner {
   @Autowired private InitDataComponent initDataComponent;
   @Autowired private ProcessOldDataFromSlack processOldDataFromSlack;
   @Autowired private SlackService slackService;
+
+  @Autowired private UserFacade userFacade;
   
   public static void main(String[] args) {
     SpringApplication.run(WorldCupTestApplication.class, args);
@@ -58,6 +61,8 @@ public class WorldCupTestApplication implements CommandLineRunner {
 //    testGetUsers();
 //    testSendLeaderBoard();
 //    testSendUserBetHistories();
+
+    userFacade.updateScore();
   }
   
   private void testCrawlMatches() {
