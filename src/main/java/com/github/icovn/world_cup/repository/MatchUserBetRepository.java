@@ -26,6 +26,6 @@ public interface MatchUserBetRepository extends JpaRepository<MatchUserBet, Stri
 
   @Query("SELECT SUM(result) AS score, userId FROM MatchUserBet "
       + "GROUP BY userId "
-      + "ORDER BY total DESC ")
+      + "ORDER BY score DESC ")
   List<MatchUserBetResultDTO> findScore();
 }
