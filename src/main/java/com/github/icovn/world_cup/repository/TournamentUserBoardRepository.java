@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TournamentUserBoardRepository extends JpaRepository<TournamentUserBoard, String> {
  
-  List<TournamentUserBoard> findAllByTournamentId(String tournamentId);
+  List<TournamentUserBoard> findAllByTournamentIdOrderByRankIndexAsc(String tournamentId);
 
   TournamentUserBoard findFirstByTournamentIdAndUserId(String tournamentId, String userId);
 }

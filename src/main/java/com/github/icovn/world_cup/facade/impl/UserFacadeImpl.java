@@ -140,11 +140,12 @@ public class UserFacadeImpl implements UserFacade {
   @Override
   public void updateScore() {
     log.info("(updateScore)");
+
     var matches = matchRepository.findAll();
     log.info("(updateScore)matches: {}", matches.size());
+
     var userBets = matchUserBetRepository.findAllByResultLessThan(0);
     log.info("(updateScore)userBets: {}", userBets.size());
-    
     for (var userBet: userBets) {
       log.debug("(updateScore)userBet: {}", userBet);
       var match = Match.getMatch(userBet.getMatchId(), matches);
@@ -172,6 +173,7 @@ public class UserFacadeImpl implements UserFacade {
     }
 
     var userScores = matchUserBetRepository.findScore();
+    log.info("(updateScore)userScores: {}", userScores.size());
     for (var i=0; i<userScores.size(); i++) {
       log.debug("(updateScore)userScore: {}", userScores.get(i));
       var tournamentUser = tournamentUserBoardRepository.findFirstByTournamentIdAndUserId(
@@ -201,7 +203,9 @@ public class UserFacadeImpl implements UserFacade {
   public void viewLeaderBoard(@NonNull String channelName) {
     log.info("(viewLeaderBoard)channelName: {}", channelName);
 
-    var userScores = tournamentUserBoardRepository.findAllByTournamentId(tournamentId);
+    var userScores = tournamentUserBoardRepository.findAllByTournamentIdOrderByRankIndexAsc(
+        tournamentId
+    );
     if (userScores.isEmpty()) {
       return;
     }
