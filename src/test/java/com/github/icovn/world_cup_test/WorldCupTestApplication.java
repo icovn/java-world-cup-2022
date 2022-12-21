@@ -62,7 +62,7 @@ public class WorldCupTestApplication implements CommandLineRunner {
 //    testSendLeaderBoard();
 //    testSendUserBetHistories();
 
-    userFacade.updateScore();
+//    userFacade.updateScore();
   }
   
   private void testCrawlMatches() {
